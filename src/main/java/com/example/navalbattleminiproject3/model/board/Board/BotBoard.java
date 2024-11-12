@@ -4,11 +4,7 @@ import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import jdk.swing.interop.SwingInterOpUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BotBoard extends BoardAdapter {
 
@@ -17,6 +13,8 @@ public class BotBoard extends BoardAdapter {
     List<List<Boats>> boardWithBoats;
 
     List<Integer> allBoatsUsed;
+
+    int boatsSinked;
 
     public BotBoard() {
         board = new ArrayList<>(10);
@@ -34,18 +32,23 @@ public class BotBoard extends BoardAdapter {
         }
         Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 
-        for(int i = 9; i>0;i--){
+        for(int i = 9 ; i>=0 ; i--){
+
             String[] boatPosition = randomBoatGeneration(allBoatsUsed.get(i));
+            Boats actualBoat = new Boats(allBoatsUsed.get(i), boatPosition);
             System.out.println("Left boat generation");
             for (String position : boatPosition ) {
-                System.out.println(position);
-                setNumberByIndex(board, i, Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
+                System.out.println("Boat position" + position);
+                setNumberByIndex(board, allBoatsUsed.get(i), Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
                 System.out.println("HI");
-                //setObjectByIndex(boardWithBoats, new Boats(i, boatPosition), Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
-                System.out.println("HI2");
+                setObjectByIndex(boardWithBoats, actualBoat, Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
+                System.out.println(showBoard(board));
             }
+            allBoatsUsed.set(i,0);
 
         }
+
+        System.out.println("Los botes usados son " + allBoatsUsed);
 
     }
 
@@ -58,12 +61,128 @@ public class BotBoard extends BoardAdapter {
     }
 
     public List<List<Integer>> getBoard() {
+
         return board;
     }
 
     public void setBoard(List<List<Integer>> board) {
         this.board = board;
     }
+
+    public String[] randomBoatGeneration(int boatNumber) {
+        System.out.println("Generating " + boatNumber+ " boat type");
+        Random random = new Random();
+        String[] boatPositions = new String[boatNumber];
+        int randomCol;
+        int randomRow;
+        int randomDirection;
+        int positionTryCounter = 0;
+        boolean needPositionRestart = false;
+        randomCol = random.nextInt(board.toArray().length);
+        randomRow = random.nextInt(board.toArray().length);
+        randomDirection = random.nextInt(4);
+
+
+        //randomBoatNumber also represents the boat length
+        do{
+            positionTryCounter++;
+            System.out.println(positionTryCounter + " try direction");
+            if(positionTryCounter == 4){
+                System.out.println("All tries of direction have been done");
+                positionTryCounter = 0;
+                randomCol++;
+                System.out.println("Adding 1 to column "+ randomCol);
+                if((randomCol == (board.toArray().length))) {
+                    randomCol = 0;
+                    randomRow++;
+                    System.out.println("Column is overIndex adding 1 to row and resetting column" + randomRow);
+                    if((randomRow == (board.toArray().length))) {
+                        randomRow = 0;
+                        System.out.println("Row is overIndex resetting row" + randomRow + randomCol);
+                    }
+                }
+
+            }
+
+            System.out.println("Creating boat: Initial row"+ randomRow + " initial col "+ randomCol + " Direction " +randomDirection);
+            if(allowedBoatPositionByNumber(board,randomRow, randomCol, randomDirection, boatNumber)) {
+
+                for (int i = 0; i < boatNumber; i++) {
+                    boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
+                    switch (randomDirection) {
+                        case 0:
+                            randomCol = randomCol + 1;
+                            break;
+                        case 1:
+                            randomRow = randomRow - 1;
+                            break;
+                        case 2:
+                            randomCol = randomCol - 1;
+                            break;
+                        case 3:
+                            randomRow = randomRow + 1;
+                            break;
+                        default:
+                            System.out.println("Wrong direction");
+
+                    }
+
+                    needPositionRestart = false;
+                }
+                System.out.println(Arrays.toString(boatPositions));
+            }else{
+                needPositionRestart = true;
+            }
+
+            }while(needPositionRestart);
+        System.out.println("I almost left");
+            return boatPositions;
+        }
+
+    public boolean randomShootInOtherBoard(List<List<Integer>> oBoard, List<List<Boats>> oBoardWithBoats){
+        Random random = new Random();
+        int randomCol = 0;
+        int randomRow = 0;
+        int boxNumber = 0;
+        Boats modifiedBoatPart;
+        boolean isBoatDestroyed = false;
+        boolean allowedPosition = true;
+        do{
+            try{
+            randomCol = random.nextInt(oBoard.toArray().length);
+            randomRow = random.nextInt(oBoard.toArray().length);
+
+
+                boxNumber = getNumberByIndex(oBoard, randomRow, randomCol);
+                if(getNumberByIndex(oBoard,randomRow,randomCol)<0){
+                    throw new IllegalArgumentException("Box already shooted");
+                }
+
+                allowedPosition = true;
+
+            }catch(IndexOutOfBoundsException  | IllegalArgumentException e){
+                System.out.println("Wrong box number" + e.getMessage());
+                allowedPosition = false;
+
+            }
+
+        }while(!allowedPosition);
+
+
+        //Higher than 0 coz all the negative numbers represent already shooted boxes
+        if(boxNumber > 0){
+            setNumberByIndex(oBoard,((-1)*boxNumber), randomRow, randomCol);
+            modifiedBoatPart = getObjectByIndex(oBoardWithBoats, randomRow, randomCol);
+            modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
+            isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
+            return isBoatDestroyed;
+        }else{
+            System.out.println("Shoot on water");
+            setNumberByIndex(oBoard,(-6), randomRow, randomCol);
+            return false;
+        }
+    }
+
 
     //    public int RandomBoatSelector() {
 //        Random random = new Random();
@@ -82,110 +201,5 @@ public class BotBoard extends BoardAdapter {
 //        return randomBoatNumber;
 //    }
 
-    public String[] randomBoatGeneration(int boatNumber) {
-        Random random = new Random();
-        String[] boatPositions = new String[boatNumber];
-        int randomCol = 0;
-        int randomRow = 0;
-        int randomDirection = 0;
-        int positionTryCounter = 0;
-        boolean needPositionRestart = false;
-        randomCol = random.nextInt(board.toArray().length);
-        randomRow = random.nextInt(board.toArray().length);
-        randomDirection = random.nextInt(4);
 
-
-        //randomBoatNumber also represents the boat length
-        do{
-            positionTryCounter++;
-            if(positionTryCounter == 4){
-                positionTryCounter = 0;
-                randomCol++;
-                if((randomCol == (board.toArray().length))) {
-                    randomCol = 0;
-                    randomRow++;
-                    if((randomRow == (board.toArray().length))) {
-                        randomRow = 0;
-                    }
-                }
-
-            }
-
-            System.out.println("Creating boat: Initial row"+ randomRow + " initial col "+ randomCol + " Direction " +randomDirection);
-            for(int i=0; i<boatNumber; i++){
-                switch (randomDirection) {
-                    case 0:
-                        if (allowedBoatPosition(randomRow, randomCol + i, randomDirection)) {
-                            System.out.println("Boat part putted");
-                            needPositionRestart = false;
-                            boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
-                        }else{
-                            positionTryCounter++;
-                            needPositionRestart = true;
-                        }
-                        break;
-
-
-                    case 1:
-                        if (allowedBoatPosition(randomRow - i, randomCol, randomDirection)) {
-                            System.out.println("Boat part putted");
-                            needPositionRestart = false;
-                            boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
-                        }else{
-                            positionTryCounter++;
-                            needPositionRestart = true;
-                        }
-                        break;
-
-                    case 2:
-                        if (allowedBoatPosition(randomRow, randomCol - i, randomDirection)) {
-                            System.out.println("Boat part putted");
-                            needPositionRestart = false;
-                            boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
-                        }else{
-                            positionTryCounter++;
-                            needPositionRestart = true;
-                        }
-                        break;
-
-                    case 3:
-                        if (allowedBoatPosition(randomRow + i, randomCol, randomDirection)) {
-                            System.out.println("Boat part putted");
-                            needPositionRestart = false;
-                            boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
-                        }else{
-                            positionTryCounter++;
-                            needPositionRestart = true;
-                        }
-                        break;
-                    default:
-                        System.out.println("Invalid direction");
-                }
-                if(needPositionRestart && positionTryCounter!=4) {
-                    System.out.println("Restart boat putting");
-                    randomDirection++;
-                    i = 0;
-                }
-            }
-            }while(needPositionRestart);
-        System.out.println("I almost left");
-            return boatPositions;
-        }
-
-
-    public boolean allowedBoatPosition(int row, int column, int direction) {
-        System.out.println("Row" +row);
-        System.out.println("Column" +column);
-        try {
-            if (getNumberByIndex(board, row, column) != 0) {
-                throw new IllegalArgumentException("Matrix position inaccessible");
-            }
-        } catch (IllegalArgumentException e1) {
-            System.out.println("The try-catch dropped" + e1.getMessage());
-            return false;
-        } catch (Exception e2){
-            System.out.println("The try-catch dropped" + e2.getMessage());
-        }
-        return true;
-    }
 }
