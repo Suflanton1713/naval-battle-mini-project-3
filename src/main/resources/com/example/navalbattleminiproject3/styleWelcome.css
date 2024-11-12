@@ -1,0 +1,35 @@
+.borderPaneClass{
+    -fx-background-image: url('welcomeBackground.png');
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+#exitButton{
+    -fx-background-color: #fd6900;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+}
+#exitButton:hover {
+    -fx-background-color: #ff0000;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+}
+#nickNameTextField{
+    -fx-background-color: transparent;
+    -fx-background-image: url("nickNameTextField.png");
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+#playButton{
+    -fx-background-color: transparent;
+    -fx-background-image: url("playButton.png");
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}
+#continueButton{
+    -fx-background-color: transparent;
+    -fx-background-image: url("continueButton.png");
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}

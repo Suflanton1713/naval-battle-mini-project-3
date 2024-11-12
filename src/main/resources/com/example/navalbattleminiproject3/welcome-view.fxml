@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1200.0" styleClass="borderPaneClass" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.navalbattleminiproject3.controller.WelcomeController">
+   <top>
+      <VBox alignment="TOP_CENTER" prefHeight="106.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button id="exitButton" mnemonicParsing="false" onAction="#handleClickExit" prefHeight="37.0" prefWidth="37.0" text="X">
+               <font>
+                  <Font name="SansSerif Regular" size="22.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="1145.0" top="5.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <VBox alignment="CENTER" prefHeight="244.0" prefWidth="556.0" spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextField id="nickNameTextField" alignment="CENTER" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="70.0" prefWidth="280.0" promptText="Digite su usuario" style="-fx-prompt-text-fill: #5477ff;">
+               <font>
+                  <Font name="SansSerif Regular" size="20.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="70.0" />
+               </VBox.margin>
+            </TextField>
+            <Button id="playButton" mnemonicParsing="false" onAction="#handleClickPlay" prefHeight="98.0" prefWidth="244.0">
+               <font>
+                  <Font name="SansSerif Bold" size="20.0" />
+               </font>
+            </Button>
+            <Button id="continueButton" mnemonicParsing="false" prefHeight="98.0" prefWidth="244.0">
+               <font>
+                  <Font name="SansSerif Bold" size="20.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
