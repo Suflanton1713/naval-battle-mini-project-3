@@ -15,7 +15,7 @@ public class GameView extends Stage {
     private GameController gameController;
 
     public GameView() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/navalbattleminiproject3/game-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/navalbattleminiproject3/fxml/game-view.fxml"));
         try{
             root = loader.load();
             gameController = loader.getController();
@@ -24,10 +24,10 @@ public class GameView extends Stage {
         }
 
         Scene scene = new Scene(root,1200,670);
-        scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styleGame.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
         setScene(scene);
         setTitle("Sudoku");
-        getIcons().add(new Image(getClass().getResourceAsStream("/com/example/navalbattleminiproject3/favicon.png")));
+        getIcons().add(new Image(getClass().getResourceAsStream("/com/example/navalbattleminiproject3/images/favicon.png")));
         setResizable(false);
         initStyle(StageStyle.UNDECORATED);
         show();

@@ -1,0 +1,63 @@
+#borderPaneClass{
+    -fx-background-image: url('../images/backgrounds/welcomeBackground.png');
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+#exitButton{
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+    -fx-border-width: 2px;
+    -fx-border-color: white;
+}
+#exitButton:hover {
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+}
+#nickNameTextField{
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+#playButton{
+    -fx-background-image: url('../images/buttons/playButton.png');
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+    -fx-border-width: 10px;
+
+}
+#continueButton{
+    -fx-background-image: url('../images/buttons/continueButton.png');
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}
+#optionsButton{
+    -fx-background-image: url('../images/buttons/optionsButton.jpg');
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}
+#creditsButton{
+    -fx-background-image: url('../images/buttons/creditsButton.png');
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}
+#instructionButton{
+    -fx-background-image: url('../images/buttons/instructionButton.jpg');
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+    -fx-cursor: "hand";
+}
+.buttons{
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+}
+
