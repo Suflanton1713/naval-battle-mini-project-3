@@ -1,6 +1,7 @@
 package com.example.navalbattleminiproject3;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
+import com.example.navalbattleminiproject3.view.WelcomeView;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,6 +13,7 @@ public class main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        WelcomeView.getInstance();
 
         BotBoard botBoard = new BotBoard();
         PlayerBoard playerBoard = new PlayerBoard();
@@ -20,6 +22,10 @@ public class main extends Application {
         playerBoard.spawnBoat(1,0,0,2);
         playerBoard.spawnBoat(4,4,0,2);
         playerBoard.spawnBoat(5,4,0,2);
+
+        System.out.println("--------------------------YOOOOOOOOOOOOOOOOOOOOOOPIIISSS-------------------");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println("yapp-----");
 
         System.out.println(playerBoard.getAllBoatsUsed());
         playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),0,0);
