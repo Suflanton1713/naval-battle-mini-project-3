@@ -1,10 +1,11 @@
 package com.example.navalbattleminiproject3.model.board.GamePieces;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Boats extends DrawsAdapter{
+public class Boats extends DrawsAdapter implements Serializable {
 
     int boatType;
     boolean boatDestroyed;

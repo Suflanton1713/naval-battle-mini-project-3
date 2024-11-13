@@ -14,12 +14,15 @@ public class PlayerBoard extends BoardAdapter{
 
     List<Integer> allBoatsUsed;
 
+    String nickname;
+
     int boatsSinked;
 
     public PlayerBoard(){
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        nickname = "Player";
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -32,6 +35,41 @@ public class PlayerBoard extends BoardAdapter{
         }
         Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 
+    }
+
+    public PlayerBoard(String nickname){
+        board = new ArrayList<>(10);
+        boardWithBoats = new ArrayList<>(10);
+        allBoatsUsed = new ArrayList<>(10);
+        this.nickname = nickname;
+        for (int i = 0; i < 10; i++) {
+            List<Integer> row = new ArrayList<>(10);
+            List<Boats> rowBoats = new ArrayList<>(10);
+            for (int x = 0; x < 10; x++) {
+                row.add(0);
+                rowBoats.add(null);
+            }
+            board.add(row);
+            boardWithBoats.add(rowBoats);
+        }
+        Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+
+    }
+
+    public int getBoatsSinked() {
+        return boatsSinked;
+    }
+
+    public void setBoatsSinked(int boatsSinked) {
+        this.boatsSinked = boatsSinked;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public List<List<Integer>> getBoard() {

@@ -1,4 +1,6 @@
 package com.example.navalbattleminiproject3.model.board.GamePieces;
 
-public abstract class DrawsAdapter implements IDraws{
+import java.io.Serializable;
+
+public abstract class DrawsAdapter implements IDraws, Serializable {
 }

@@ -1,8 +1,11 @@
 package com.example.navalbattleminiproject3;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
+import com.example.navalbattleminiproject3.model.board.GameData.PlainTextGameData;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import java.util.Arrays;
 
 public class main extends Application {
 
@@ -14,7 +17,8 @@ public class main extends Application {
     public void start(Stage primaryStage) {
 
         BotBoard botBoard = new BotBoard();
-        PlayerBoard playerBoard = new PlayerBoard();
+        PlayerBoard playerBoard = new PlayerBoard("suflanton");
+        PlayerBoard playerBoard1 = new PlayerBoard("elpanda");
 
         playerBoard.spawnBoat(0,0,0,2);
         playerBoard.spawnBoat(1,0,0,2);
@@ -43,6 +47,11 @@ public class main extends Application {
 
         System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
         System.out.println(botBoard.showBoard(botBoard.getBoard()));
-        
+
+        PlainTextGameData plainText = new PlainTextGameData();
+        plainText.writeToFile("data_panda.csv", "panda3+" + "," + 1);
+        System.out.println(Arrays.toString(plainText.readFromFile("data_panda.csv")));
+        System.out.println("GHi");
+
     }
 }
