@@ -1,18 +1,23 @@
 package com.example.navalbattleminiproject3.view;
 
 import com.example.navalbattleminiproject3.controller.GameController;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
 public class GameView extends Stage {
     private Parent root;
     private GameController gameController;
+    private StackPane mainPane;
 
     public GameView() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/navalbattleminiproject3/fxml/game-view.fxml"));
@@ -23,7 +28,12 @@ public class GameView extends Stage {
             e.printStackTrace();
         }
 
-        Scene scene = new Scene(root,1200,670);
+        VideoView videoView = new VideoView();
+        mainPane = new StackPane(videoView.getMainPane());
+        StopVideo();
+
+        // Configurar la escena y ventana
+        Scene scene = new Scene(mainPane, 1300, 670);
         scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
         setScene(scene);
         setTitle("Sudoku");
@@ -51,5 +61,15 @@ public class GameView extends Stage {
         GameViewHolder.INSTANCE = null;
     }
 
-
+    private void StopVideo() {
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(1600), event -> {
+                })
+        );
+        timeline.setCycleCount(1600); // Cambiado a 100 ciclos
+        timeline.setOnFinished(event -> {
+            mainPane.getChildren().clear();
+            mainPane.getChildren().add(root);
+        });
+    }
 }
