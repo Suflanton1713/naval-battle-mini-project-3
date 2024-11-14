@@ -8,22 +8,27 @@ import java.util.List;
 
 public class PlayerBoard extends BoardAdapter{
 
-    List<List<Integer>> board;
+    private List<List<Integer>> board;
 
-    List<List<Boats>> boardWithBoats;
+    private List<List<Boats>> boardWithBoats;
 
-    List<Integer> allBoatsUsed;
+    private List<Integer> allBoatsUsed;
 
-    String nickname;
+    private String nickname;
 
-    int boatsSunk;
+    private int boatsSunkEver;
+
+    private int actualGameBoatsSunk;
+    private boolean winner;
 
     public PlayerBoard(){
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
-        boatsSunk = 0;
+        boatsSunkEver = 0;
+        actualGameBoatsSunk = 0;
         nickname = "Player";
+        winner = false;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -42,8 +47,10 @@ public class PlayerBoard extends BoardAdapter{
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
-        boatsSunk = 0;
+        boatsSunkEver = 0;
+        actualGameBoatsSunk = 0;
         this.nickname = nickname;
+        winner = false;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -58,13 +65,6 @@ public class PlayerBoard extends BoardAdapter{
 
     }
 
-    public int getBoatsSunk() {
-        return boatsSunk;
-    }
-
-    public void getBoatsSunk(int boatsSunk) {
-        this.boatsSunk = boatsSunk;
-    }
 
     public String getNickname() {
         return nickname;
@@ -97,6 +97,45 @@ public class PlayerBoard extends BoardAdapter{
     public void setAllBoatsUsed(List<Integer> allBoatsUsed) {
         this.allBoatsUsed = allBoatsUsed;
     }
+
+    public int getBoatsSunkEver() {
+        return boatsSunkEver;
+    }
+
+    public void setBoatsSunkEver(int boatsSunkEver) {
+        this.boatsSunkEver = boatsSunkEver;
+    }
+
+    public int getActualGameBoatsSunk() {
+        return actualGameBoatsSunk;
+    }
+
+    public void setActualGameBoatsSunk(int actualGameBoatsSunk) {
+        this.actualGameBoatsSunk = actualGameBoatsSunk;
+    }
+    public boolean isWinnner(){
+        return (actualGameBoatsSunk == 10);
+    }
+
+    public void boatSunk(){
+        actualGameBoatsSunk++;
+        boatsSunkEver++;
+    }
+
+    public void restartGame(){
+        allBoatsUsed.clear();
+        Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
+        System.out.println(allBoatsUsed);
+        actualGameBoatsSunk = 0;
+
+        for(int i = 0; i<10;i++){
+            for(int j = 0; j<10;j++){
+                board.get(i).set(i,0);
+                boardWithBoats.get(i).set(i,null);
+            }
+        }
+    }
+
 
     @Override
     public boolean spawnBoat(int row, int column, int direction, int boatType) {
@@ -180,7 +219,5 @@ public class PlayerBoard extends BoardAdapter{
         }
     }
 
-    public void boatSunkByPlayer(){
-        boatsSunk++;
-    }
+
 }

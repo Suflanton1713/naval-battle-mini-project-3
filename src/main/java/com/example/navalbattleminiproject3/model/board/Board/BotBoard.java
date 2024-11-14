@@ -14,12 +14,13 @@ public class BotBoard extends BoardAdapter {
 
     List<Integer> allBoatsUsed;
 
-    int boatsSinked;
+    int actualGameBoatsSunk;
 
     public BotBoard() {
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        actualGameBoatsSunk = 0;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -182,6 +183,28 @@ public class BotBoard extends BoardAdapter {
             return false;
         }
     }
+
+    public boolean isWinnner(){
+        return (actualGameBoatsSunk == 10);
+    }
+    public void boatSunk(){
+        actualGameBoatsSunk++;
+    }
+
+    public void restartGame(){
+        allBoatsUsed.clear();
+        Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
+        System.out.println(allBoatsUsed);
+        actualGameBoatsSunk = 0;
+
+        for(int i = 0; i<10;i++){
+            for(int j = 0; j<10;j++){
+                board.get(i).set(i,0);
+                boardWithBoats.get(i).set(i,null);
+            }
+        }
+    }
+
 
 
     //    public int RandomBoatSelector() {
