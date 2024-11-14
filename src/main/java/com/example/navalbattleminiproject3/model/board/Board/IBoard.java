@@ -9,9 +9,9 @@ import java.util.List;
 public interface IBoard {
 
 
-    boolean shootInOtherBoard(List<List<Integer>> board, List<List<Boats>> boardWithBoats, int row, int column);
+    boolean shootInOtherBoard(BoardAdapter attackedBoard, int row, int column);
 
-    boolean randomShootInOtherBoard(List<List<Integer>> board, List<List<Boats>> boardWithBoats);
+    boolean randomShootInOtherBoard(BoardAdapter attackedBoard);
 
     boolean spawnBoat(int row, int column, int direction, int boatType);
 
@@ -21,36 +21,9 @@ public interface IBoard {
         return hittedBoard.get(row).get(column) != 0;
     }
 
-    default int shootInBox(List<List<Integer>> hittedBoard, int row, int column) {
-        switch (getNumberByIndex(hittedBoard, row, column)) {
-            case 1:
-                System.out.println("Hitted miniboat");
-                setNumberByIndex(hittedBoard, row, column, -1);
-                return -1;
+    List<List<Integer>> getBoard();
 
-            case 2:
-                System.out.println("Hitted no so miniboat");
-                setNumberByIndex(hittedBoard, row, column, -2);
-                return -2;
-
-            case 3:
-                System.out.println("Hitted medium boat");
-                setNumberByIndex(hittedBoard, row, column, -3);
-                return -3;
-
-            case 4:
-                System.out.println("Hitted biggy boat");
-                setNumberByIndex(hittedBoard, row, column, -4);
-                return -4;
-
-            default:
-                System.out.println("Dayum didnt hit no boat");
-                setNumberByIndex(hittedBoard, row, column, 10);
-                return 10;
-
-        }
-    }
-
+    List<List<Boats>> getBoardWithBoats();
 
     default void setNumberByIndex(List<List<Integer>> board, int number, int row, int column) {
         board.get(row).set(column, number);

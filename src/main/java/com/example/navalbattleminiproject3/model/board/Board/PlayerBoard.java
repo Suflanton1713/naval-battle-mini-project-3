@@ -16,12 +16,13 @@ public class PlayerBoard extends BoardAdapter{
 
     String nickname;
 
-    int boatsSinked;
+    int boatsSunk;
 
     public PlayerBoard(){
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        boatsSunk = 0;
         nickname = "Player";
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
@@ -41,6 +42,7 @@ public class PlayerBoard extends BoardAdapter{
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        boatsSunk = 0;
         this.nickname = nickname;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
@@ -56,12 +58,12 @@ public class PlayerBoard extends BoardAdapter{
 
     }
 
-    public int getBoatsSinked() {
-        return boatsSinked;
+    public int getBoatsSunk() {
+        return boatsSunk;
     }
 
-    public void setBoatsSinked(int boatsSinked) {
-        this.boatsSinked = boatsSinked;
+    public void getBoatsSunk(int boatsSunk) {
+        this.boatsSunk = boatsSunk;
     }
 
     public String getNickname() {
@@ -147,14 +149,14 @@ public class PlayerBoard extends BoardAdapter{
         return true;
     }
 
-    public boolean shootInOtherBoard(List<List<Integer>> oBoard, List<List<Boats>> oBoardWithBoats,int row, int column){
+    public boolean shootInOtherBoard(BoardAdapter attackedBoard,int row, int column){
         int boxNumber;
         Boats modifiedBoatPart;
         boolean isBoatDestroyed = false;
 
         try{
-            boxNumber = getNumberByIndex(oBoard, row, column);
-            if(getNumberByIndex(oBoard,row,column)<0){
+            boxNumber = getNumberByIndex(attackedBoard.getBoard(), row, column);
+            if(getNumberByIndex(attackedBoard.getBoard(),row,column)<0){
                 throw new IllegalArgumentException("Box already shooted");
             }
 
@@ -166,15 +168,19 @@ public class PlayerBoard extends BoardAdapter{
 
         //Higher than 0 coz all the negative numbers represent already shooted boxes
         if(boxNumber > 0){
-            setNumberByIndex(oBoard,((-1)*boxNumber), row, column);
-            modifiedBoatPart = getObjectByIndex(oBoardWithBoats, row, column);
+            setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), row, column);
+            modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), row, column);
             modifiedBoatPart.destroyBoatParts(row,column);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             return isBoatDestroyed;
         }else{
             System.out.println("Shoot on water");
-            setNumberByIndex(oBoard,(-6), row, column);
+            setNumberByIndex(attackedBoard.getBoard(),(-6), row, column);
             return false;
         }
+    }
+
+    public void boatSunkByPlayer(){
+        boatsSunk++;
     }
 }

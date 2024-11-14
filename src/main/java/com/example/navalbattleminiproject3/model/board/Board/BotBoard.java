@@ -139,7 +139,7 @@ public class BotBoard extends BoardAdapter {
             return boatPositions;
         }
 
-    public boolean randomShootInOtherBoard(List<List<Integer>> oBoard, List<List<Boats>> oBoardWithBoats){
+    public boolean randomShootInOtherBoard(BoardAdapter attackedBoard){
         Random random = new Random();
         int randomCol = 0;
         int randomRow = 0;
@@ -149,12 +149,12 @@ public class BotBoard extends BoardAdapter {
         boolean allowedPosition = true;
         do{
             try{
-            randomCol = random.nextInt(oBoard.toArray().length);
-            randomRow = random.nextInt(oBoard.toArray().length);
+            randomCol = random.nextInt(attackedBoard.getBoard().toArray().length);
+            randomRow = random.nextInt(attackedBoard.getBoard().toArray().length);
 
 
-                boxNumber = getNumberByIndex(oBoard, randomRow, randomCol);
-                if(getNumberByIndex(oBoard,randomRow,randomCol)<0){
+                boxNumber = getNumberByIndex(attackedBoard.getBoard(), randomRow, randomCol);
+                if(getNumberByIndex(attackedBoard.getBoard(),randomRow,randomCol)<0){
                     throw new IllegalArgumentException("Box already shooted");
                 }
 
@@ -171,14 +171,14 @@ public class BotBoard extends BoardAdapter {
 
         //Higher than 0 coz all the negative numbers represent already shooted boxes
         if(boxNumber > 0){
-            setNumberByIndex(oBoard,((-1)*boxNumber), randomRow, randomCol);
-            modifiedBoatPart = getObjectByIndex(oBoardWithBoats, randomRow, randomCol);
+            setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), randomRow, randomCol);
+            modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), randomRow, randomCol);
             modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             return isBoatDestroyed;
         }else{
             System.out.println("Shoot on water");
-            setNumberByIndex(oBoard,(-6), randomRow, randomCol);
+            setNumberByIndex(attackedBoard.getBoard(),(-6), randomRow, randomCol);
             return false;
         }
     }
