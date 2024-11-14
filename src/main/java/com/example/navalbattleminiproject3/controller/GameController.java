@@ -21,17 +21,18 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
-    List<Boats> usedBoats = new ArrayList<>(10);
-    Pane shipType1Num1;
-    Pane shipType2Num1;
-    Pane shipType3Num1;
-    Pane shipType4Num1;
+    List<Boats> usedBotBoats = new ArrayList<>(10);
+    List<Boats> usedPlayerBoats = new ArrayList<>(10);
+    List<Pane> playerShips = new ArrayList<>(10);
+    List<Pane> botShips = new ArrayList<>(10);
 
     @FXML
     private VBox shipsVBox;
@@ -48,19 +49,29 @@ public class GameController {
         WelcomeView.getInstance();
     }
 
+
     @FXML
     public void initialize() {
         playerBoard = new PlayerBoard();
         botBoard = new BotBoard();
-        shipType1Num1= createShip(1);
-        shipType2Num1= createShip(2);
-        shipType3Num1= createShip(3);
-        shipType4Num1= createShip(4);
-
-        shipsVBox.getChildren().addAll(shipType1Num1, shipType2Num1, shipType3Num1, shipType4Num1);
+        createBoardShips();
+        for (int i = 0; i < 10; i++) {
+            shipsVBox.getChildren().add(playerShips.get(i));
+        }
 
     }
-    public Pane createShip(int type) {
+    public void createBoardShips(){
+        List<Integer> temporaryNumberBoats = new ArrayList<>(10);
+        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+        for(int i = 0; i<10; i++){
+            Pane playerShip = createShip(temporaryNumberBoats.get(i),1);
+            Pane botShip = createShip(temporaryNumberBoats.get(i),2);
+            playerShips.add(playerShip);
+            botShips.add(botShip);
+        }
+    }
+
+    public Pane createShip(int type, int playerOrBot) {
         Pane root = new Pane();
         root.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-style: solid;");
 
@@ -76,8 +87,9 @@ public class GameController {
         root.setPrefSize(type * 35, 35);
 
         root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-
-        root.setOnMouseClicked(event -> rotateBoat(root));
+        if(playerOrBot == 1){
+            root.setOnMouseClicked(event -> rotateBoat(root));
+        }
 
         return root;
     }
@@ -88,7 +100,6 @@ public class GameController {
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(300), boat);
         rotateTransition.setByAngle(90);
-
 
         rotateTransition.setOnFinished(event -> boat.setDisable(false));
 
@@ -102,41 +113,107 @@ public class GameController {
                 rect.setFill(Color.LIGHTBLUE);
                 rect.setStroke(Color.BLACK);
                 botGridPane.add(rect, j, i);
-                int boardValue = botBoard.getObjectByIndex(botBoard.getBoard(), i, j);
+                int boardValue = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
                 if(boardValue == 1 || boardValue == 2 || boardValue == 3 || boardValue == 4){
-                    if(!(usedBoats.contains(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j)))){
-                        positionShipWithDirection(botBoard.getObjectByIndex(botBoard.getBoard(),i,j),i,j);
-                        usedBoats.add(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j));
+                    if(!(usedBotBoats.contains(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j)))){
+                        positionBotShipWithDirection(botBoard.getNumberByIndex(botBoard.getBoard(),i,j),i,j);
+                        usedBotBoats.add(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j));
                     }
                 }
 
             }
         }
     }
-     public void positionShipWithDirection(int type, int row, int col){
+     public void positionBotShipWithDirection(int type, int row, int col){
+        Pane ship = getPaneOfShip(type,2);
         if (botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection()==0||
                 botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection()==180){
-            placeBoatInCell(getPaneOfShip(type),row,col,botGridPane);
+            placeBoatInCell(ship,row,col,botGridPane);
         }else{
-            rotateBoat(getPaneOfShip(type));
-            placeBoatInCell(getPaneOfShip(type),row,col,botGridPane);
+            rotateBoat(ship);
+            placeBoatInCell(ship,row,col,botGridPane);
         }
      }
 
-    public Pane getPaneOfShip(int type) {
+    public Pane getPaneOfShip(int type,int playerOrBot) {
         switch (type) {
             case 1:
-                return shipType1Num1;
+                if(playerOrBot == 1){
+                    for(int i=0; i<4;i++){
+                        if(playerShips.get(i) != null){
+                            Pane ship = playerShips.get(i);
+                            playerShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }else{
+                    for(int i=0; i<4;i++){
+                        if(botShips.get(i) != null){
+                            Pane ship = botShips.get(i);
+                            botShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }
+                break;
             case 2:
-                return shipType2Num1;
+                if(playerOrBot == 1){
+                    for(int i=4; i<7;i++){
+                        if(playerShips.get(i) != null){
+                            Pane ship = playerShips.get(i);
+                            playerShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }else{
+                    for(int i=4; i<7;i++){
+                        if(botShips.get(i) != null){
+                            Pane ship = botShips.get(i);
+                            botShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }
+                break;
             case 3:
-                return shipType3Num1;
+                if(playerOrBot == 1){
+                    for(int i=7; i<9;i++){
+                        if(playerShips.get(i) != null){
+                            Pane ship = playerShips.get(i);
+                            playerShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }else{
+                    for(int i=7; i<9;i++){
+                        if(botShips.get(i) != null){
+                            Pane ship = botShips.get(i);
+                            botShips.set(i, null);
+                            return ship;
+                        }
+                    }
+                }
+                break;
             case 4:
-                return shipType4Num1;
+                if(playerOrBot == 1){
+                    if(playerShips.get(9) != null){
+                        Pane ship = playerShips.get(9);
+                        playerShips.set(9, null);
+                        return ship;
+                    }
+                } else{
+                    if(botShips.get(9) != null){
+                        Pane ship = botShips.get(9);
+                        botShips.set(9, null);
+                        return ship;
+                    }
+                    break;
+                }
             default:
                 System.err.println("Error: Tipo de barco no válido: " + type);
                 return null;
         }
+        return null;
     }
 
     public void createPlayerTable(){
@@ -153,6 +230,7 @@ public class GameController {
                 playerGridPane.add(rect, j, i);
             }
         }
+        playerGridPane.add(playerShips.get(5), 0, 0);
     }
 
     public void handleMouseEnter(Rectangle rect) {
