@@ -68,6 +68,32 @@ public interface IBoard {
         return board.get(row).get(column);
     }
 
+    default int getDirectionByPosition(String[] boatPosition){
+
+        if(boatPosition.length==1){
+            return 0;
+        }
+
+        if(boatPosition[0].charAt(0) == boatPosition[1].charAt(0)){
+            //Row doesnt change
+            if(Integer.parseInt(""+boatPosition[0].charAt(1)) < Integer.parseInt(""+boatPosition[1].charAt(1))){
+                return 0;
+            }else{
+                return 2;
+            }
+
+        }else{
+            //Column doesnt change
+
+            if(Integer.parseInt(""+boatPosition[0].charAt(0)) < Integer.parseInt(""+boatPosition[1].charAt(0))){
+                return 3;
+            }else{
+                return 1;
+            }
+
+        }
+    }
+
     default boolean allowedBoatPositionByNumber(List<List<Integer>> board, int row, int column, int direction, int boatType){
         System.out.println("Watching if boat is in allowed position, type of boat " + boatType + " initial Row " + row + " , column " + column + " and direction " + direction);
 

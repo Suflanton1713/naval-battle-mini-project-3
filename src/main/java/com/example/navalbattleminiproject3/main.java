@@ -23,10 +23,6 @@ public class main extends Application {
         playerBoard.spawnBoat(4,4,0,2);
         playerBoard.spawnBoat(5,4,0,2);
 
-        System.out.println("--------------------------YOOOOOOOOOOOOOOOOOOOOOOPIIISSS-------------------");
-        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-        System.out.println("yapp-----");
-
         System.out.println(playerBoard.getAllBoatsUsed());
         playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),0,0);
         System.out.println("bote 00 " +playerBoard.getBoardWithBoats().get(0).get(0));
