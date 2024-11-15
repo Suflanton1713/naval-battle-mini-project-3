@@ -113,8 +113,15 @@ public class PlayerBoard extends BoardAdapter{
     public void setActualGameBoatsSunk(int actualGameBoatsSunk) {
         this.actualGameBoatsSunk = actualGameBoatsSunk;
     }
+
     public boolean isWinnner(){
-        return (actualGameBoatsSunk == 10);
+        return winner;
+    }
+
+    public void winMatch(){
+        if((actualGameBoatsSunk == 10)){
+            winner = true;
+        }
     }
 
     public void boatSunk(){
