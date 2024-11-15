@@ -7,17 +7,19 @@ import java.util.List;
 
 public class Boats extends DrawsAdapter implements Serializable {
 
-    int boatType;
-    boolean boatDestroyed;
-    int partsDestroyed;
-    List<List<Integer>> boatUbication;
-    List<String> boatDamaged;
+    private int boatType;
+    private boolean boatDestroyed;
+    private int partsDestroyed;
+    private int boatDirection;
+    private List<List<Integer>> boatUbication;
+    private List<String> boatDamaged;
 
     public Boats(){
         boatType = 1;
         boatDestroyed = false;
         boatUbication = new ArrayList<>();
         boatDamaged = new ArrayList<>();
+        boatDirection = 0;
 
         for (int i = 0; i < boatType; i++) {
             boatDamaged.add("");
@@ -29,12 +31,13 @@ public class Boats extends DrawsAdapter implements Serializable {
         }
     }
 
-    public Boats(int boatType, String[] positionList){
+    public Boats(int boatType, int boatDirection, String[] positionList){
         System.out.println("The size of the boat is " + boatType + " the size of the positionList array is" + positionList.length);
         this.boatType = boatType;
         boatDestroyed = false;
         boatUbication = new ArrayList<>();
         boatDamaged = new ArrayList<>();
+        this.boatDirection = boatDirection;
 
         for (int i = 0; i < boatType; i++) {
             boatDamaged.add("");
@@ -65,6 +68,22 @@ public class Boats extends DrawsAdapter implements Serializable {
     public List<String> getBoatDamaged() {
         System.out.println("Boat damaged "+ boatDamaged);
         return boatDamaged;
+    }
+
+    public int getPartsDestroyed() {
+        return partsDestroyed;
+    }
+
+    public void setPartsDestroyed(int partsDestroyed) {
+        this.partsDestroyed = partsDestroyed;
+    }
+
+    public int getBoatDirection() {
+        return boatDirection;
+    }
+
+    public void setBoatDirection(int boatDirection) {
+        this.boatDirection = boatDirection;
     }
 
     public void setBoatDamaged(List<String> boatDamaged) {

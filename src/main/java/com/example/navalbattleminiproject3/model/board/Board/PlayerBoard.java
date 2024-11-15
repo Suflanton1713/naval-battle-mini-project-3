@@ -174,7 +174,7 @@ public class PlayerBoard extends BoardAdapter{
 
             }
 
-                Boats actualBoat = new Boats(boatType, boatPositions);
+                Boats actualBoat = new Boats(boatType, direction, boatPositions);
                 System.out.println("Left boat generation");
                 for (String position : boatPositions ) {
                     System.out.println("Boat position" + position);

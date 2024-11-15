@@ -36,7 +36,8 @@ public class BotBoard extends BoardAdapter {
         for(int i = 9 ; i>=0 ; i--){
 
             String[] boatPosition = randomBoatGeneration(allBoatsUsed.get(i));
-            Boats actualBoat = new Boats(allBoatsUsed.get(i), boatPosition);
+
+            Boats actualBoat = new Boats(allBoatsUsed.get(i),getDirectionByPosition(boatPosition), boatPosition);
             System.out.println("Left boat generation");
             for (String position : boatPosition ) {
                 System.out.println("Boat position" + position);
@@ -133,6 +134,11 @@ public class BotBoard extends BoardAdapter {
                 System.out.println(Arrays.toString(boatPositions));
             }else{
                 needPositionRestart = true;
+            }
+
+            randomDirection++;
+            if(randomDirection==4){
+                randomDirection=0;
             }
 
             }while(needPositionRestart);
