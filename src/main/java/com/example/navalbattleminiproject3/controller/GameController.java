@@ -10,10 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
@@ -33,6 +30,7 @@ public class GameController {
     List<Boats> usedPlayerBoats = new ArrayList<>(10);
     List<Pane> playerShips = new ArrayList<>(10);
     List<Pane> botShips = new ArrayList<>(10);
+    int positionBotShipsToSetNull = 0;
 
     @FXML
     private VBox shipsVBox;
@@ -42,6 +40,17 @@ public class GameController {
 
     @FXML
     private GridPane playerGridPane;
+    @FXML
+    private StackPane stackPane1;
+
+    @FXML
+    private StackPane stackPane2;
+
+    @FXML
+    private StackPane stackPane3;
+
+    @FXML
+    private StackPane stackPane4;
 
     @FXML
     void handleClickExit(ActionEvent event) {
@@ -55,11 +64,37 @@ public class GameController {
         playerBoard = new PlayerBoard();
         botBoard = new BotBoard();
         createBoardShips();
-        for (int i = 0; i < 10; i++) {
-            shipsVBox.getChildren().add(playerShips.get(i));
-        }
+        organizePlayerShipsInVBox();
+        System.out.println("botShips: "+ showArrayBotShips());
 
     }
+
+    public void organizePlayerShipsInVBox() {
+        for (int i = 0; i < 4; i++) {
+            stackPane1.getChildren().add(playerShips.get(i));
+        }
+        for (int i = 4; i < 7; i++) {
+            stackPane2.getChildren().add(playerShips.get(i));
+        }
+        for (int i = 7; i < 9; i++) {
+            stackPane3.getChildren().add(playerShips.get(i));
+        }
+        for (int i = 9; i < 10; i++) {
+            stackPane4.getChildren().add(playerShips.get(i));
+        }
+    }
+
+    public String showArrayBotShips() {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < botShips.size(); i++) {
+            Pane pane = botShips.get(i);
+            result.append("Pane ").append(i + 1).append(": ")
+                    .append(pane != null ? pane.toString() : "null").append("\n");
+        }
+        String output = result.toString();
+        return output;
+    }
+
     public void createBoardShips(){
         List<Integer> temporaryNumberBoats = new ArrayList<>(10);
         Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
@@ -79,8 +114,10 @@ public class GameController {
             Rectangle rect = new Rectangle(35, 35);
             rect.setFill(Color.PINK);
             rect.setStroke(Color.RED);
+
             rect.setX(i * 35);
             rect.setY(0);
+
             root.getChildren().add(rect);
         }
 
@@ -113,108 +150,85 @@ public class GameController {
                 rect.setFill(Color.LIGHTBLUE);
                 rect.setStroke(Color.BLACK);
                 botGridPane.add(rect, j, i);
+            }
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 int boardValue = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
                 if(boardValue == 1 || boardValue == 2 || boardValue == 3 || boardValue == 4){
                     if(!(usedBotBoats.contains(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j)))){
-                        positionBotShipWithDirection(botBoard.getNumberByIndex(botBoard.getBoard(),i,j),i,j);
+                        positionBotShipWithDirection(boardValue,i,j);
                         usedBotBoats.add(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j));
                     }
                 }
-
             }
         }
     }
      public void positionBotShipWithDirection(int type, int row, int col){
         Pane ship = getPaneOfShip(type,2);
-        if (botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection()==0||
-                botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection()==180){
+        int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+         System.out.println("tipo de barco que se agarró: "+type+" direccion: "+boardDirection
+         + " fila: "+row+" column: "+col);
+        if (boardDirection==0|| boardDirection==2){
+            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
+            botShips.set(positionBotShipsToSetNull, null);
+            System.out.println("despues de posicionar: "+ showArrayBotShips());
+
         }else{
             rotateBoat(ship);
+
+            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
+            botShips.set(positionBotShipsToSetNull, null);
+            System.out.println("despues de posicionar: "+ showArrayBotShips());
         }
      }
 
-    public Pane getPaneOfShip(int type,int playerOrBot) {
+    public Pane getPaneOfShip(int type, int playerOrBot) {
+
+        int startIndex = 0;
+        int endIndex = 0;
+
         switch (type) {
             case 1:
-                if(playerOrBot == 1){
-                    for(int i=0; i<4;i++){
-                        if(playerShips.get(i) != null){
-                            Pane ship = playerShips.get(i);
-                            playerShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }else{
-                    for(int i=0; i<4;i++){
-                        if(botShips.get(i) != null){
-                            Pane ship = botShips.get(i);
-                            botShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }
+                startIndex = 0;
+                endIndex = 4;
                 break;
             case 2:
-                if(playerOrBot == 1){
-                    for(int i=4; i<7;i++){
-                        if(playerShips.get(i) != null){
-                            Pane ship = playerShips.get(i);
-                            playerShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }else{
-                    for(int i=4; i<7;i++){
-                        if(botShips.get(i) != null){
-                            Pane ship = botShips.get(i);
-                            botShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }
+                startIndex = 4;
+                endIndex = 7;
                 break;
             case 3:
-                if(playerOrBot == 1){
-                    for(int i=7; i<9;i++){
-                        if(playerShips.get(i) != null){
-                            Pane ship = playerShips.get(i);
-                            playerShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }else{
-                    for(int i=7; i<9;i++){
-                        if(botShips.get(i) != null){
-                            Pane ship = botShips.get(i);
-                            botShips.set(i, null);
-                            return ship;
-                        }
-                    }
-                }
+                startIndex = 7;
+                endIndex = 9;
                 break;
             case 4:
-                if(playerOrBot == 1){
-                    if(playerShips.get(9) != null){
-                        Pane ship = playerShips.get(9);
-                        playerShips.set(9, null);
-                        return ship;
-                    }
-                } else{
-                    if(botShips.get(9) != null){
-                        Pane ship = botShips.get(9);
-                        botShips.set(9, null);
-                        return ship;
-                    }
-                    break;
-                }
+                startIndex = 9;
+                endIndex = 10;
+                break;
             default:
                 System.err.println("Error: Tipo de barco no válido: " + type);
                 return null;
         }
+
+        List<Pane> shipsList = (playerOrBot == 1) ? playerShips : botShips;
+
+        for (int i = startIndex; i < endIndex; i++) {
+            if (shipsList.get(i) != null) {
+                Pane ship = shipsList.get(i);
+                positionBotShipsToSetNull = i;
+//                shipsList.set(i, null);
+//                System.out.println("pane que se va a poner: " + ship+ "de tipo: " + type);
+//                System.out.println(showArrayBotShips());
+                return ship;
+
+            }
+        }
         return null;
     }
+
 
     public void createPlayerTable(){
         for (int i = 0; i < 10; i++) {
@@ -241,19 +255,18 @@ public class GameController {
         rect.setFill(Color.LIGHTBLUE);  // Restaurar color original
     }
 
-//    public void handleCellClick(int row, int col, GridPane grid) {
-//        System.out.println("Clicked on cell: (" + row + ", " + col + ")");
-//        playerBoard.spawnBoat(row,col,0,2);
-//        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-//        placeBoatInCell(row, col, grid);
-//    }
-    public void placeBoatInCell(Pane shipType, int row, int col, GridPane grid) {
-        grid.add(shipType, col, row);
+    public void placeBoatInCell(Pane ship, int row, int col, GridPane grid) {
+        grid.add(ship, col, row);
+//        System.out.println("poniendo barco en row: "+row+" y col: "+col+" :"
+//                +botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection());
     }
 
 
     public void startPlay() {
         createBotTable();
+//        botGridPane.add(botShips.get(9), 5, 5);
+//        rotateBoat(botShips.get(9));
+//        placeBoatInCell(botShips.get(9), 2, 5, botGridPane);
         createPlayerTable();
     }
 
