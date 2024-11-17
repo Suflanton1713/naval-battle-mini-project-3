@@ -14,12 +14,13 @@ public class BotBoard extends BoardAdapter {
 
     List<Integer> allBoatsUsed;
 
-    int boatsSinked;
+    int actualGameBoatsSunk;
 
     public BotBoard() {
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        actualGameBoatsSunk = 0;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -35,7 +36,8 @@ public class BotBoard extends BoardAdapter {
         for(int i = 9 ; i>=0 ; i--){
 
             String[] boatPosition = randomBoatGeneration(allBoatsUsed.get(i));
-            Boats actualBoat = new Boats(allBoatsUsed.get(i), boatPosition);
+
+            Boats actualBoat = new Boats(allBoatsUsed.get(i),getDirectionByPosition(boatPosition), boatPosition);
             System.out.println("Left boat generation");
             for (String position : boatPosition ) {
                 System.out.println("Boat position" + position);
@@ -144,7 +146,7 @@ public class BotBoard extends BoardAdapter {
             return boatPositions;
         }
 
-    public boolean randomShootInOtherBoard(List<List<Integer>> oBoard, List<List<Boats>> oBoardWithBoats){
+    public boolean randomShootInOtherBoard(BoardAdapter attackedBoard){
         Random random = new Random();
         int randomCol = 0;
         int randomRow = 0;
@@ -154,12 +156,12 @@ public class BotBoard extends BoardAdapter {
         boolean allowedPosition = true;
         do{
             try{
-            randomCol = random.nextInt(oBoard.toArray().length);
-            randomRow = random.nextInt(oBoard.toArray().length);
+            randomCol = random.nextInt(attackedBoard.getBoard().toArray().length);
+            randomRow = random.nextInt(attackedBoard.getBoard().toArray().length);
 
 
-                boxNumber = getNumberByIndex(oBoard, randomRow, randomCol);
-                if(getNumberByIndex(oBoard,randomRow,randomCol)<0){
+                boxNumber = getNumberByIndex(attackedBoard.getBoard(), randomRow, randomCol);
+                if(getNumberByIndex(attackedBoard.getBoard(),randomRow,randomCol)<0){
                     throw new IllegalArgumentException("Box already shooted");
                 }
 
@@ -176,17 +178,39 @@ public class BotBoard extends BoardAdapter {
 
         //Higher than 0 coz all the negative numbers represent already shooted boxes
         if(boxNumber > 0){
-            setNumberByIndex(oBoard,((-1)*boxNumber), randomRow, randomCol);
-            modifiedBoatPart = getObjectByIndex(oBoardWithBoats, randomRow, randomCol);
+            setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), randomRow, randomCol);
+            modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), randomRow, randomCol);
             modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             return isBoatDestroyed;
         }else{
             System.out.println("Shoot on water");
-            setNumberByIndex(oBoard,(-6), randomRow, randomCol);
+            setNumberByIndex(attackedBoard.getBoard(),(-6), randomRow, randomCol);
             return false;
         }
     }
+
+    public boolean isWinnner(){
+        return (actualGameBoatsSunk == 10);
+    }
+    public void boatSunk(){
+        actualGameBoatsSunk++;
+    }
+
+    public void restartGame(){
+        allBoatsUsed.clear();
+        Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
+        System.out.println(allBoatsUsed);
+        actualGameBoatsSunk = 0;
+
+        for(int i = 0; i<10;i++){
+            for(int j = 0; j<10;j++){
+                board.get(i).set(i,0);
+                boardWithBoats.get(i).set(i,null);
+            }
+        }
+    }
+
 
 
     //    public int RandomBoatSelector() {

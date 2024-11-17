@@ -13,6 +13,7 @@ public class main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         WelcomeView.getInstance();
 
         BotBoard botBoard = new BotBoard();
@@ -23,18 +24,12 @@ public class main extends Application {
         playerBoard.spawnBoat(4,4,0,2);
         playerBoard.spawnBoat(5,4,0,2);
 
-        System.out.println("--------------------------YOOOOOOOOOOOOOOOOOOOOOOPIIISSS-------------------");
-        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-        System.out.println("yapp-----");
-
         System.out.println(playerBoard.getAllBoatsUsed());
-        playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),0,0);
-        System.out.println("bote 00 " +playerBoard.getBoardWithBoats().get(0).get(0));
-        System.out.println("bote 01 " +playerBoard.getBoardWithBoats().get(0).get(1));
+        playerBoard.shootInOtherBoard(botBoard,0,0);
         System.out.println("aaaaa Bote en 00 destruído? " +playerBoard.getBoardWithBoats().get(0).get(0).isBoatDestroyed());
 
-        playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),3,0);
-        playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),0,1);
+        playerBoard.shootInOtherBoard(botBoard,3,0);
+        playerBoard.shootInOtherBoard(botBoard,0,1);
         System.out.println("aaaaa Bote en 01 destruído? " +playerBoard.getBoardWithBoats().get(0).get(1).isBoatDestroyed());
 
 
@@ -44,10 +39,11 @@ public class main extends Application {
 
         System.out.println("---------------------------------------------");
 
-        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
-        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
-        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
-        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
+        botBoard.randomShootInOtherBoard(playerBoard);
+        botBoard.randomShootInOtherBoard(playerBoard);
+        botBoard.randomShootInOtherBoard(playerBoard);
+        botBoard.randomShootInOtherBoard(playerBoard);
+        botBoard.randomShootInOtherBoard(playerBoard);
 
         System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
         System.out.println(botBoard.showBoard(botBoard.getBoard()));

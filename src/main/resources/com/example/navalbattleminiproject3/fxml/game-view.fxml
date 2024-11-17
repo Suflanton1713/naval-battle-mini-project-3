@@ -11,11 +11,11 @@
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.navalbattleminiproject3.controller.GameController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="160.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="400.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="60.0" minWidth="5.0" prefWidth="480.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="400.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="160.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="217.0" minWidth="10.0" prefWidth="217.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="390.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="78.0" minWidth="5.0" prefWidth="51.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="393.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="149.0" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints maxHeight="219.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
@@ -38,7 +38,7 @@
             </Button>
          </children>
       </VBox>
-      <GridPane style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <GridPane maxWidth="-Infinity" minHeight="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="35.0" prefWidth="35.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="35.0" prefWidth="35.0" />
@@ -66,7 +66,7 @@
             <RowConstraints maxHeight="100.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <GridPane fx:id="playerGridPane" gridLinesVisible="true" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="1" GridPane.rowSpan="10">
+            <GridPane fx:id="playerGridPane" gridLinesVisible="true" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="35.0" prefWidth="35.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="1" GridPane.rowSpan="10">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="35.0" prefWidth="35.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="35.0" prefWidth="35.0" />
@@ -225,7 +225,7 @@
             <Label prefHeight="50.0" prefWidth="50.0" style="-fx-border-color: black;" />
          </children>
       </GridPane>
-      <GridPane style="-fx-border-color: black;" GridPane.columnIndex="3" GridPane.rowIndex="1">
+      <GridPane maxWidth="-Infinity" minHeight="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-border-color: black;" GridPane.columnIndex="3" GridPane.rowIndex="1">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="35.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="35.0" />
@@ -253,7 +253,7 @@
             <RowConstraints maxHeight="100.0" minHeight="-Infinity" prefHeight="35.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <GridPane fx:id="botGridPane" gridLinesVisible="true" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="1" GridPane.rowSpan="10">
+            <GridPane fx:id="botGridPane" gridLinesVisible="true" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="35.0" prefWidth="35.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="1" GridPane.rowSpan="10">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="35.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="35.0" />
@@ -412,14 +412,7 @@
             <Label maxWidth="-Infinity" minHeight="-Infinity" prefHeight="37.0" prefWidth="36.5" style="-fx-border-color: black;" />
          </children>
       </GridPane>
-      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <children>
-            <Button fx:id="ship1" mnemonicParsing="false" text="barco 1">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </Button>
-         </children>
-      </VBox>
+      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="95.0" GridPane.rowIndex="1" GridPane.rowSpan="2" />
    </children>
 </GridPane>

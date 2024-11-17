@@ -8,18 +8,27 @@ import java.util.List;
 
 public class PlayerBoard extends BoardAdapter{
 
-    List<List<Integer>> board;
+    private List<List<Integer>> board;
 
-    List<List<Boats>> boardWithBoats;
+    private List<List<Boats>> boardWithBoats;
 
-    List<Integer> allBoatsUsed;
+    private List<Integer> allBoatsUsed;
 
-    int boatsSinked;
+    private String nickname;
+
+    private int boatsSunkEver;
+
+    private int actualGameBoatsSunk;
+    private boolean winner;
 
     public PlayerBoard(){
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
         allBoatsUsed = new ArrayList<>(10);
+        boatsSunkEver = 0;
+        actualGameBoatsSunk = 0;
+        nickname = "Player";
+        winner = false;
         for (int i = 0; i < 10; i++) {
             List<Integer> row = new ArrayList<>(10);
             List<Boats> rowBoats = new ArrayList<>(10);
@@ -32,6 +41,37 @@ public class PlayerBoard extends BoardAdapter{
         }
         Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 
+    }
+
+    public PlayerBoard(String nickname){
+        board = new ArrayList<>(10);
+        boardWithBoats = new ArrayList<>(10);
+        allBoatsUsed = new ArrayList<>(10);
+        boatsSunkEver = 0;
+        actualGameBoatsSunk = 0;
+        this.nickname = nickname;
+        winner = false;
+        for (int i = 0; i < 10; i++) {
+            List<Integer> row = new ArrayList<>(10);
+            List<Boats> rowBoats = new ArrayList<>(10);
+            for (int x = 0; x < 10; x++) {
+                row.add(0);
+                rowBoats.add(null);
+            }
+            board.add(row);
+            boardWithBoats.add(rowBoats);
+        }
+        Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+
+    }
+
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public List<List<Integer>> getBoard() {
@@ -57,6 +97,52 @@ public class PlayerBoard extends BoardAdapter{
     public void setAllBoatsUsed(List<Integer> allBoatsUsed) {
         this.allBoatsUsed = allBoatsUsed;
     }
+
+    public int getBoatsSunkEver() {
+        return boatsSunkEver;
+    }
+
+    public void setBoatsSunkEver(int boatsSunkEver) {
+        this.boatsSunkEver = boatsSunkEver;
+    }
+
+    public int getActualGameBoatsSunk() {
+        return actualGameBoatsSunk;
+    }
+
+    public void setActualGameBoatsSunk(int actualGameBoatsSunk) {
+        this.actualGameBoatsSunk = actualGameBoatsSunk;
+    }
+
+    public boolean isWinnner(){
+        return winner;
+    }
+
+    public void winMatch(){
+        if((actualGameBoatsSunk == 10)){
+            winner = true;
+        }
+    }
+
+    public void boatSunk(){
+        actualGameBoatsSunk++;
+        boatsSunkEver++;
+    }
+
+    public void restartGame(){
+        allBoatsUsed.clear();
+        Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
+        System.out.println(allBoatsUsed);
+        actualGameBoatsSunk = 0;
+
+        for(int i = 0; i<10;i++){
+            for(int j = 0; j<10;j++){
+                board.get(i).set(i,0);
+                boardWithBoats.get(i).set(i,null);
+            }
+        }
+    }
+
 
     @Override
     public boolean spawnBoat(int row, int column, int direction, int boatType) {
@@ -88,7 +174,7 @@ public class PlayerBoard extends BoardAdapter{
 
             }
 
-                Boats actualBoat = new Boats(boatType, boatPositions);
+                Boats actualBoat = new Boats(boatType, direction, boatPositions);
                 System.out.println("Left boat generation");
                 for (String position : boatPositions ) {
                     System.out.println("Boat position" + position);
@@ -109,14 +195,14 @@ public class PlayerBoard extends BoardAdapter{
         return true;
     }
 
-    public boolean shootInOtherBoard(List<List<Integer>> oBoard, List<List<Boats>> oBoardWithBoats,int row, int column){
+    public boolean shootInOtherBoard(BoardAdapter attackedBoard,int row, int column){
         int boxNumber;
         Boats modifiedBoatPart;
         boolean isBoatDestroyed = false;
 
         try{
-            boxNumber = getNumberByIndex(oBoard, row, column);
-            if(getNumberByIndex(oBoard,row,column)<0){
+            boxNumber = getNumberByIndex(attackedBoard.getBoard(), row, column);
+            if(getNumberByIndex(attackedBoard.getBoard(),row,column)<0){
                 throw new IllegalArgumentException("Box already shooted");
             }
 
@@ -128,15 +214,17 @@ public class PlayerBoard extends BoardAdapter{
 
         //Higher than 0 coz all the negative numbers represent already shooted boxes
         if(boxNumber > 0){
-            setNumberByIndex(oBoard,((-1)*boxNumber), row, column);
-            modifiedBoatPart = getObjectByIndex(oBoardWithBoats, row, column);
+            setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), row, column);
+            modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), row, column);
             modifiedBoatPart.destroyBoatParts(row,column);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             return isBoatDestroyed;
         }else{
             System.out.println("Shoot on water");
-            setNumberByIndex(oBoard,(-6), row, column);
+            setNumberByIndex(attackedBoard.getBoard(),(-6), row, column);
             return false;
         }
     }
+
+
 }
