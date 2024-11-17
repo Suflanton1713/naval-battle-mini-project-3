@@ -189,6 +189,7 @@ public class PlayerBoard extends BoardAdapter{
 
         }catch(IllegalArgumentException e){
             System.out.println("Cannot spawn boat in this position" + e.getMessage());
+            return false;
 
         }
 
