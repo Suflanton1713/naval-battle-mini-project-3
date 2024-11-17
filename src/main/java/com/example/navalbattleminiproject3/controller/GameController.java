@@ -185,7 +185,7 @@ public class GameController {
 
             playerGridPane.setOnMouseClicked(event -> {
                 for (Pane ship : playerShips) {
-                    if (ship != null && ship.isFocused()) {
+                    if ( ship.isFocused()) {
 
                         int col = (int) (event.getX() / 35);
                         int row = (int) (event.getY() / 35);
@@ -347,21 +347,74 @@ public class GameController {
                 Rectangle rect = new Rectangle(35,35);
                 rect.setFill(Color.LIGHTBLUE);
                 rect.setStroke(Color.BLACK);
-                rect.setOnMouseEntered(event -> handleMouseEnter(rect));
-                rect.setOnMouseExited(event -> handleMouseExit(rect));
                 int row = i;
                 int col = j;
-//                rect.setOnMouseClicked(event -> handleCellClick(row, col, playerGridPane));
+                rect.setOnMouseEntered(event -> handleMouseEnter(rect, row, col));
+                rect.setOnMouseExited(event -> handleMouseExit(rect, row, col));
+
                 playerGridPane.add(rect, j, i);
             }
         }
     }
 
-    public void handleMouseEnter(Rectangle rect) {
+    public void handleMouseEnter(Rectangle rect, int row, int col) {
+        for (Pane ship : playerShips) {
+            if (ship != null && ship.isFocused()) {
+                int shipType = getPlayerShipType(ship);
+                int shipDirection = getShipDirection(ship);
+                hoverPlayerBoard(row, col, shipType, shipDirection, Color.DARKBLUE);
+            }
+        }
         rect.setFill(Color.DARKBLUE);
     }
 
-    public void handleMouseExit(Rectangle rect) {
+    public void hoverPlayerBoard(int row, int col, int type, int direction, Color highlightColor) {
+        int num = switch (type) {
+            case 2 -> 1;
+            case 3 -> 2;
+            case 4 -> 3;
+            default -> 0;
+        };
+
+        for (int i = 0; i <= num; i++) {
+            int directionCol = col, DirectionRow = row;
+            switch (direction) {
+                case 0 -> directionCol = col + i; // Derecha
+                case 1 -> DirectionRow = row - i; // Arriba
+                case 2 -> directionCol = col - i; // Izquierda
+                case 3 -> DirectionRow = row + i; // Abajo
+            }
+
+            // Verifica si el nodo está dentro de los límites
+            if (directionCol >= 0 && directionCol < 10 && DirectionRow >= 0 && DirectionRow < 10) {
+                Node node = getNodeFromGridPane(playerGridPane, directionCol, DirectionRow);
+                if (node instanceof Rectangle) {
+                    ((Rectangle) node).setFill(highlightColor);
+                }
+            }
+        }
+    }
+
+    public Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            Integer nodeCol = GridPane.getColumnIndex(node);
+            Integer nodeRow = GridPane.getRowIndex(node);
+
+            if (nodeCol != null && nodeRow != null && nodeCol == col && nodeRow == row) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    public void handleMouseExit(Rectangle rect, int row, int col) {
+        for (Pane ship : playerShips) {
+            if (ship != null && ship.isFocused()) {
+                int shipType = getPlayerShipType(ship);
+                int shipDirection = getShipDirection(ship);
+                hoverPlayerBoard(row, col, shipType, shipDirection, Color.LIGHTBLUE);
+            }
+        }
         rect.setFill(Color.LIGHTBLUE);
     }
 
