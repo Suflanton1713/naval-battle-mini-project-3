@@ -47,7 +47,6 @@ public class WelcomeView extends Stage {
         loadingContainer.setAlignment(Pos.CENTER);
 
         // Crear el StackPane para el video
-        VideoView videoView = new VideoView();
         mainPane = new StackPane(loadingContainer);
 
         // Configurar la escena y ventana
