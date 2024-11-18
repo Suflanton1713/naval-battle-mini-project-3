@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -413,6 +414,19 @@
          </children>
       </GridPane>
       <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="95.0" GridPane.rowIndex="1" GridPane.rowSpan="2" />
+      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="95.0" GridPane.rowIndex="1" GridPane.rowSpan="2">
+         <children>
+            <StackPane fx:id="stackPane1" prefHeight="35.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </StackPane>
+            <StackPane fx:id="stackPane2" prefHeight="35.0" prefWidth="200.0" />
+            <StackPane fx:id="stackPane3" prefHeight="35.0" prefWidth="200.0" />
+            <StackPane fx:id="stackPane4" prefHeight="35.0" prefWidth="200.0" />
+         </children>
+         <GridPane.margin>
+            <Insets top="20.0" />
+         </GridPane.margin></VBox>
    </children>
 </GridPane>

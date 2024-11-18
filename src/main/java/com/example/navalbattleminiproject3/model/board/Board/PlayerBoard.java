@@ -1,5 +1,6 @@
 package com.example.navalbattleminiproject3.model.board.Board;
 
+import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 
 import java.util.ArrayList;
@@ -148,8 +149,12 @@ public class PlayerBoard extends BoardAdapter{
     public boolean spawnBoat(int row, int column, int direction, int boatType) {
         String[] boatPositions = new String[boatType];
         try{
-            if(!(allowedBoatPositionByNumber(board, row, column, direction, boatType)) || !(allBoatsUsed.contains(boatType))){
-                throw new IllegalArgumentException("Cannot spawn boat by that position or not available boat ");
+            if(!(allowedBoatPositionByNumber(board, row, column, direction, boatType))){
+                throw new GameException.OutOfBoardAction("Cannot spawn boat by that position. ");
+            }
+
+            if(!(allBoatsUsed.contains(boatType))){
+                throw new GameException.NoBoardFound("Not available boat");
             }
             for (int i = 0; i < boatType; i++) {
                 boatPositions[i] = String.valueOf(row) + String.valueOf(column);
@@ -187,9 +192,13 @@ public class PlayerBoard extends BoardAdapter{
 
             allBoatsUsed.set(allBoatsUsed.indexOf(boatType),0);
 
-        }catch(IllegalArgumentException e){
+        }catch(GameException.OutOfBoardAction e){
             System.out.println("Cannot spawn boat in this position" + e.getMessage());
+            return false;
 
+        }catch(Exception e){
+            System.out.println("Fatal error ocurred on spawning boat functino. " + e.getMessage());
+            return false;
         }
 
         return true;

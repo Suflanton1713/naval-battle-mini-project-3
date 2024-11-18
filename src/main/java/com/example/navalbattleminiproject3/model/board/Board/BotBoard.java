@@ -1,5 +1,6 @@
 package com.example.navalbattleminiproject3.model.board.Board;
 
+import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import jdk.swing.interop.SwingInterOpUtils;
 
@@ -162,15 +163,17 @@ public class BotBoard extends BoardAdapter {
 
                 boxNumber = getNumberByIndex(attackedBoard.getBoard(), randomRow, randomCol);
                 if(getNumberByIndex(attackedBoard.getBoard(),randomRow,randomCol)<0){
-                    throw new IllegalArgumentException("Box already shooted");
+                    throw new GameException.BoxAlreadyActivated("Box already shooted");
                 }
 
                 allowedPosition = true;
 
-            }catch(IndexOutOfBoundsException  | IllegalArgumentException e){
+            }catch(GameException.BoxAlreadyActivated e){
                 System.out.println("Wrong box number" + e.getMessage());
                 allowedPosition = false;
 
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
 
         }while(!allowedPosition);

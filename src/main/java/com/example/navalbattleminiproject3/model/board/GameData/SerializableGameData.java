@@ -2,7 +2,7 @@ package com.example.navalbattleminiproject3.model.board.GameData;
 
 import java.io.*;
 
-public class SerializableGameData extends dataFileHandler{
+public class SerializableGameData extends DataFileHandler {
 
     private File directory;
 

@@ -1,6 +1,6 @@
 package com.example.navalbattleminiproject3.model.board.GameData;
 
-public abstract class dataFileHandler {
+public abstract class DataFileHandler {
 
     public void rewriteFile(String fileName, String content){};
 
