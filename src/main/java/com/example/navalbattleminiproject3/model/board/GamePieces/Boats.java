@@ -1,11 +1,13 @@
 package com.example.navalbattleminiproject3.model.board.GamePieces;
 
+import com.example.navalbattleminiproject3.model.board.Exception.GameException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Boats extends DrawsAdapter implements Serializable {
+public class Boats implements Serializable {
 
     private int boatType;
     private boolean boatDestroyed;
@@ -104,17 +106,32 @@ public class Boats extends DrawsAdapter implements Serializable {
         if(!(boatDamaged.contains(""))){
             System.out.println("Boat has not damaged parts left");
             boatDestroyed = true;
+
         }
         return boatDestroyed;
     }
 
 
     public void destroyBoatParts(int row, int column){
-        String damageUbication = String.valueOf(row) + String.valueOf(column);
-        boatDamaged.set(partsDestroyed, damageUbication);
-        partsDestroyed++;
-        System.out.println(boatDamaged);
-        isBoatDestroyed();
+
+        try{
+            String damageUbication = String.valueOf(row) + String.valueOf(column);
+            if(!(boatUbication.contains(damageUbication))){
+                throw new GameException.InaccessiblePartInBoat("Trying to destroy a non-existence part in boat");
+            }
+
+            boatDamaged.set(partsDestroyed, damageUbication);
+            partsDestroyed++;
+            System.out.println(boatDamaged);
+            isBoatDestroyed();
+
+        }catch(GameException.InaccessiblePartInBoat e){
+            System.out.println(e.getMessage());
+
+        }catch(Exception e){
+            System.out.println("Fatal unknown error happened. Can't destroy boat part");
+        }
+
 
     }
 }

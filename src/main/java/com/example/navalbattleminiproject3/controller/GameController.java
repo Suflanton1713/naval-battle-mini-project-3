@@ -4,10 +4,12 @@ import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import com.example.navalbattleminiproject3.view.GameView;
+import com.example.navalbattleminiproject3.view.HalconView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
@@ -140,29 +142,35 @@ public class GameController {
     }
 
     public Pane createShip(int type, int playerOrBot) {
-        Pane root = new Pane();
-        root.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-style: solid;");
+        StackPane root = new StackPane();
+        root.setMinSize(type * 35, 35);
+        root.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
+
+
 
         for (int i = 0; i < type; i++) {
-            Rectangle rect = new Rectangle(35, 35);
-            rect.setFill(Color.PINK);
-            rect.setStroke(Color.RED);
+            HalconView halcon = new HalconView();
+            Group halconRoot = halcon.getRoot();
 
-            rect.setX(i * 35);
-            rect.setY(0);
+            halconRoot.setLayoutX(0); // Ajustar la posición relativa si es necesario
+            halconRoot.setLayoutY(0);
 
-            root.getChildren().add(rect);
+            // Ajustar el tamaño y la posición dentro de la celda
+
+            halconRoot.setScaleX(0.25);
+            halconRoot.setScaleY(0.25);
+
+            // Añadir al barco
+            root.getChildren().add(halconRoot);
         }
 
-        root.setPrefSize(type * 35, 35);
 
         root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        if(playerOrBot == 1){
+        if (playerOrBot == 1) {
 
             root.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.R) {
-                    rotateBoat(root,1);
-
+                    rotateBoat(root, 1);
                 }
             });
 
@@ -172,12 +180,14 @@ public class GameController {
 
             root.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 for (Node node : root.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        Rectangle rect = (Rectangle) node;
-                        if (newValue) {
-                            rect.setFill(Color.LAWNGREEN);
-                        } else {
-                            rect.setFill(Color.PINK);
+                    if (node instanceof Group) {
+                        // Cambiar el color del Halcón cuando se enfoca
+                        Group halconRoot = (Group) node;
+                        for (Node child : halconRoot.getChildren()) {
+                            if (child instanceof Circle) {
+                                Circle circle = (Circle) child;
+                                circle.setFill(newValue ? Color.LAWNGREEN : Color.web("#e7e7e7"));
+                            }
                         }
                     }
                 }
@@ -185,14 +195,14 @@ public class GameController {
 
             playerGridPane.setOnMouseClicked(event -> {
                 for (Pane ship : playerShips) {
-                    if ( ship.isFocused()) {
+                    if (ship.isFocused()) {
 
                         int col = (int) (event.getX() / 35);
                         int row = (int) (event.getY() / 35);
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
 
-                            if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
+                            if (playerBoard.spawnBoat(row, col, getShipDirection(ship), getPlayerShipType(ship))) {
                                 placeBoatInCell(ship, row, col, playerGridPane);
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
@@ -201,21 +211,19 @@ public class GameController {
 
                             System.out.println("-------------AQUIIIII---------------------------------------------------------");
                             System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-                            System.out.println("direction: "+getShipDirection(ship));
-                            System.out.println("type: "+getPlayerShipType(ship));
+                            System.out.println("direction: " + getShipDirection(ship));
+                            System.out.println("type: " + getPlayerShipType(ship));
                         }
 
                         break;
                     }
                 }
             });
-//            makeDraggable(root);
-//            root.setOnMouseClicked(event -> rotateBoat(root));
         }
-
 
         return root;
     }
+
 
     public int getPlayerShipType(Pane ship){
         for (int i = 0; i < playerShips.size(); i++) {
@@ -418,10 +426,19 @@ public class GameController {
         rect.setFill(Color.LIGHTBLUE);
     }
 
-    public void placeBoatInCell(Pane ship, int row, int col, GridPane grid) {
-        grid.add(ship, col, row);
+    public void placeBoatInCell(Pane ship, int row, int col, GridPane gridPane) {
+        // Remueve el barco del nodo padre actual (si es necesario)
+        if (ship.getParent() != null) {
+            ((Pane) ship.getParent()).getChildren().remove(ship);
+        }
 
+        // Coloca el barco en la celda especificada
+        gridPane.add(ship, col, row);
+
+        // Ajusta el tamaño del barco para que encaje en la celda
+        //ship.setPrefSize(35, 35 * getPlayerShipType(ship)); // Ajusta el alto basado en el tipo de barco
     }
+
 
 //    public void makeDraggable(Node node) {
 //        // Variables para almacenar las coordenadas iniciales del nodo

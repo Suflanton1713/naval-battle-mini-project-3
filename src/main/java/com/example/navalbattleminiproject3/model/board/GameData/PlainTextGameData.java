@@ -1,11 +1,9 @@
 package com.example.navalbattleminiproject3.model.board.GameData;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-public class PlainTextGameData extends dataFileHandler {
+public class PlainTextGameData extends DataFileHandler {
     private File directory;
 
     public PlainTextGameData(){

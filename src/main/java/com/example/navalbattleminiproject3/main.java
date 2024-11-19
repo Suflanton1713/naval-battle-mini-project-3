@@ -19,7 +19,6 @@ public class main extends Application {
         BotBoard botBoard = new BotBoard();
         PlayerBoard playerBoard = new PlayerBoard();
 
-<<<<<<< HEAD
         playerBoard.spawnBoat(0,0,0,2);
         playerBoard.spawnBoat(1,0,0,2);
         playerBoard.spawnBoat(4,4,0,2);
@@ -37,12 +36,11 @@ public class main extends Application {
 
         System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
         System.out.println(playerBoard.showBoard(playerBoard.getBoardWithBoats()));
-=======
+
 //        playerBoard.spawnBoat(0,0,1,2);
         boolean num = playerBoard.spawnBoat(0,0,1,2);
 //        playerBoard.spawnBoat(4,4,1,2);
 //        playerBoard.spawnBoat(5,4,1,4);
->>>>>>> 32d277e52a62a5e2c6456f4cd407472b477e5226
 
 //        System.out.println(playerBoard.getAllBoatsUsed());
 //        playerBoard.shootInOtherBoard(botBoard.getBoard(),botBoard.getBoardWithBoats(),0,0);
@@ -66,7 +64,8 @@ public class main extends Application {
 //        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
 //        botBoard.randomShootInOtherBoard(playerBoard.getBoard(),playerBoard.getBoardWithBoats());
 
-<<<<<<< HEAD
+
+
         botBoard.randomShootInOtherBoard(playerBoard);
         botBoard.randomShootInOtherBoard(playerBoard);
         botBoard.randomShootInOtherBoard(playerBoard);
@@ -75,11 +74,15 @@ public class main extends Application {
 
         System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
         System.out.println(botBoard.showBoard(botBoard.getBoard()));
-=======
+
         System.out.println("player board: \n"+playerBoard.showBoard(playerBoard.getBoard()));
         System.out.println("bot board: \n"+botBoard.showBoard(botBoard.getBoard()));
         System.out.println(num);
->>>>>>> 32d277e52a62a5e2c6456f4cd407472b477e5226
+
+        System.out.println("player board: \n"+playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println("bot board: \n"+botBoard.showBoard(botBoard.getBoard()));
+        System.out.println(num);
+
         
     }
 }
