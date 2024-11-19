@@ -147,7 +147,7 @@ public class BotBoard extends BoardAdapter {
             return boatPositions;
         }
 
-    public boolean randomShootInOtherBoard(BoardAdapter attackedBoard){
+    public int[] randomShootInOtherBoard(BoardAdapter attackedBoard){
         Random random = new Random();
         int randomCol = 0;
         int randomRow = 0;
@@ -155,6 +155,7 @@ public class BotBoard extends BoardAdapter {
         Boats modifiedBoatPart;
         boolean isBoatDestroyed = false;
         boolean allowedPosition = true;
+        int[] destroyedPart = new int[2];
         do{
             try{
             randomCol = random.nextInt(attackedBoard.getBoard().toArray().length);
@@ -185,11 +186,15 @@ public class BotBoard extends BoardAdapter {
             modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), randomRow, randomCol);
             modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
-            return isBoatDestroyed;
+            destroyedPart[0] = randomRow;
+            destroyedPart[1] = randomCol;
+            return destroyedPart;
         }else{
             System.out.println("Shoot on water");
             setNumberByIndex(attackedBoard.getBoard(),(-6), randomRow, randomCol);
-            return false;
+            destroyedPart[0] = randomRow;
+            destroyedPart[1] = randomCol;
+            return destroyedPart;
         }
     }
 

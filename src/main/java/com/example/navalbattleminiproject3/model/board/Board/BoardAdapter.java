@@ -10,7 +10,9 @@ public abstract class BoardAdapter implements IBoard, Serializable {
 
     public boolean shootInOtherBoard(BoardAdapter attackedBoard, int row, int column){return false;}
 
-    public boolean randomShootInOtherBoard(BoardAdapter attackedBoard){return false;}
+    public int[] randomShootInOtherBoard(BoardAdapter attackedBoard) {
+        return new int[0];
+    }
 
     public boolean spawnBoat(int row, int column, int direction, int boatType){return false;}
 

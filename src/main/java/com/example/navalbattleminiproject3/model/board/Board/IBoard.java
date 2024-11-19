@@ -12,7 +12,7 @@ public interface IBoard {
 
     boolean shootInOtherBoard(BoardAdapter attackedBoard, int row, int column);
 
-    boolean randomShootInOtherBoard(BoardAdapter attackedBoard);
+    int[] randomShootInOtherBoard(BoardAdapter attackedBoard);
 
     boolean spawnBoat(int row, int column, int direction, int boatType);
 

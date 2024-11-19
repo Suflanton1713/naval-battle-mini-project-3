@@ -11,16 +11,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,11 +30,13 @@ public class GameController {
     private List<Pane> playerShips = new ArrayList<>(10);
     private List<Pane> botShips = new ArrayList<>(10);
     private List<Integer> temporaryNumberBoats = new ArrayList<>(10);
+    private List<Pane> usedBotPaneShip = new ArrayList<>(10);
     int positionBotShipsToSetNull = 0;
     int positionPlayerShipsToSetNull = 0;
     private int rotationCounter = 0;
     private double mouseAnchorX;
     private double mouseAnchorY;
+    private boolean isWatchBotBoardOn = false;
 
 
     @FXML
@@ -59,6 +58,10 @@ public class GameController {
 
     @FXML
     private StackPane stackPane4;
+
+
+    @FXML
+    private Button startButton;
 
     @FXML
     void handleClickExit(ActionEvent event) {
@@ -130,6 +133,17 @@ public class GameController {
         return output;
     }
 
+    public String showBotUsedShips() {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < usedBotPaneShip.size(); i++) {
+            Pane pane = usedBotPaneShip.get(i);
+            result.append("Pane ").append(i + 1).append(": ")
+                    .append(pane != null ? pane.toString() : "null").append("\n");
+        }
+        String output = result.toString();
+        return output;
+    }
+
     public void createBoardShips(){
         for(int i = 0; i<10; i++){
             Pane playerShip = createShip(temporaryNumberBoats.get(i),1);
@@ -158,11 +172,9 @@ public class GameController {
 
         root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         if(playerOrBot == 1){
-
             root.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.R) {
                     rotateBoat(root,1);
-
                 }
             });
 
@@ -185,18 +197,19 @@ public class GameController {
 
             playerGridPane.setOnMouseClicked(event -> {
                 for (Pane ship : playerShips) {
-                    if ( ship.isFocused()) {
 
+                    if ( ship.isFocused()) {
                         int col = (int) (event.getX() / 35);
                         int row = (int) (event.getY() / 35);
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
-
                             if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
                                 placeBoatInCell(ship, row, col, playerGridPane);
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
                                 organizePlayerShipsInVBox(getPlayerShipType(ship));
+                            }else{
+                                hoverPlayerBoard(row,col,getPlayerShipType(ship),getShipDirection(ship),Color.RED);
                             }
 
                             System.out.println("-------------AQUIIIII---------------------------------------------------------");
@@ -227,7 +240,6 @@ public class GameController {
     }
 
     public void rotateBoat(Pane boat, int  playerOrBot) {
-
         boat.setDisable(true);
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(300), boat);
@@ -235,6 +247,9 @@ public class GameController {
         rotateTransition.setOnFinished(event -> {
             boat.setDisable(false);
             boat.requestFocus();
+            if(playerOrBot == 1){
+                clearHoverEffect();
+            }
         });
 
         rotateTransition.play();
@@ -258,6 +273,7 @@ public class GameController {
     }
 
     public void createBotTable(){
+
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 Rectangle rect = new Rectangle(35, 35);
@@ -269,15 +285,17 @@ public class GameController {
 
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                int boardValue = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
-                if(boardValue == 1 || boardValue == 2 || boardValue == 3 || boardValue == 4){
+                int shipType = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
+                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
                     if(!(usedBotBoats.contains(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j)))){
-                        positionBotShipWithDirection(boardValue,i,j);
+                        positionBotShipWithDirection(shipType,i,j);
                         usedBotBoats.add(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j));
                     }
                 }
             }
         }
+
+
     }
      public void positionBotShipWithDirection(int type, int row, int col){
         Pane ship = getPaneOfShip(type,2);
@@ -287,14 +305,15 @@ public class GameController {
         if (boardDirection==0|| boardDirection==2){
             System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
+            usedBotPaneShip.add(ship);
             botShips.set(positionBotShipsToSetNull, null);
             System.out.println("despues de posicionar: "+ showArrayBotShips());
 
         }else{
             rotateBoat(ship, 2);
-
             System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
+            usedBotPaneShip.add(ship);
             botShips.set(positionBotShipsToSetNull, null);
             System.out.println("despues de posicionar: "+ showArrayBotShips());
         }
@@ -353,6 +372,14 @@ public class GameController {
                 rect.setOnMouseExited(event -> handleMouseExit(rect, row, col));
 
                 playerGridPane.add(rect, j, i);
+            }
+        }
+    }
+
+    public void clearHoverEffect() {
+        for (Node node : playerGridPane.getChildren()) {
+            if (node instanceof Rectangle rect) {
+                rect.setFill(Color.LIGHTBLUE); // Restaurar color inicial
             }
         }
     }
@@ -420,8 +447,126 @@ public class GameController {
 
     public void placeBoatInCell(Pane ship, int row, int col, GridPane grid) {
         grid.add(ship, col, row);
+    }
+
+    @FXML
+    void handleClickStart(ActionEvent event) {
+        if(usedPlayerPanes.size()==10) {
+            startButton.setDisable(true);
+            prepareBotBoardForShot();
+        }
 
     }
+    public void changeTurnToBot(){
+        disablePlayerBoard(false);
+        for (Pane ship : usedPlayerPanes) {
+            ship.setMouseTransparent(true);
+        }
+        int[] destroyedPart;
+        destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
+        int row = destroyedPart[0];
+        int col = destroyedPart[1];
+        System.out.println("row: "+row+" col: "+col);
+        System.out.println("despues de shot: ");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        makeShot(row,col, 2);
+
+        disableBotBoard(false);
+    }
+
+    public void prepareBotBoardForShot(){
+        for (Pane ship : usedBotPaneShip) {
+            ship.setMouseTransparent(true);
+        }
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Node node = getNodeFromGridPane(botGridPane, i, j);
+                if ((node instanceof Rectangle)) {
+                    int row = i, col = j;
+                    node.setOnMouseEntered(event -> handleMouseEnter((Rectangle) node, row, col));
+                    node.setOnMouseExited(event -> handleMouseExit((Rectangle) node, row, col));
+                    node.setOnMouseClicked(event -> {
+                        makeShot(col,row, 1);
+                        disableBotBoard(true);
+                        changeTurnToBot();
+                    });
+                }
+
+            }
+        }
+    }
+
+    public void disableBotBoard(boolean disable){
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Node node = getNodeFromGridPane(botGridPane, i, j);
+                node.setDisable(disable);
+            }
+        }
+    }
+    public void disablePlayerBoard(boolean disable){
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Node node = getNodeFromGridPane(playerGridPane, i, j);
+                node.setDisable(disable);
+            }
+        }
+    }
+
+    public void makeShot(int row, int col, int playerOrBot){
+        int type = 0;
+        if(playerOrBot == 1){
+            playerBoard.shootInOtherBoard(botBoard,row,col);
+            System.out.println(botBoard.showBoard(botBoard.getBoard()));
+            type = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
+        }else{
+            type = playerBoard.getNumberByIndex(playerBoard.getBoard(),row,col);
+            System.out.println("row: "+row+" col: "+col);
+            System.out.println("type: " + type);
+        }
+
+        Circle shot = new Circle();
+        shot.setRadius(10);
+        shot.setTranslateX(7.5);
+        switch (type) {
+            case -6:
+                shot.setFill(Color.CHOCOLATE);
+                break;
+            case -1:
+                shot.setFill(Color.GREEN);
+                break;
+            case -2:
+                shot.setFill(Color.PURPLE);
+                break;
+            case -3:
+                shot.setFill(Color.DARKRED);
+                break;
+            case -4:
+                shot.setFill(Color.ROYALBLUE);
+                break;
+        }
+        if (playerOrBot==1){
+            botGridPane.add(shot, col, row);
+            System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
+        }else{
+            playerGridPane.add(shot, col, row);
+            System.out.println("player board: "+ playerBoard.showBoard(botBoard.getBoard()));
+        }
+    }
+
+    @FXML
+    public void handleWatchBotBoard(ActionEvent event) {
+        isWatchBotBoardOn = !isWatchBotBoardOn;
+
+        for (Pane ship : usedBotPaneShip) {
+            if(isWatchBotBoardOn){
+                ship.setVisible(false);
+            }else{
+                ship.setVisible(true);
+            }
+        }
+    }
+
 
 //    public void makeDraggable(Node node) {
 //        // Variables para almacenar las coordenadas iniciales del nodo
