@@ -460,44 +460,64 @@ public class GameController {
 
     }
     public void changeTurnToBot(){
+
+        disablePlayerBoard(false);
+        for (Pane ship : usedPlayerPanes) {
+            ship.setMouseTransparent(true);
+        }
+
         System.out.println("Botes destruídos por jugador" + playerBoard.getActualGameBoatsSunk());
         System.out.println("El jugador gano" + playerBoard.isWinnner());
 
         System.out.println("Botes destruídos por bot" + botBoard.getActualGameBoatsSunk());
         System.out.println("El jugador gano" + botBoard.isWinnner());
 
-        if(!botBoard.isWinnner()){
-            disableBotBoard(false);
-        }else{
-            System.out.println("El bot gano");
-            disableBotBoard(true);
-            disablePlayerBoard(true);
-        }
-
-        disablePlayerBoard(false);
-        for (Pane ship : usedPlayerPanes) {
-            ship.setMouseTransparent(true);
-        }
-        int[] destroyedPart;
-        destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
-        int row = destroyedPart[0];
-        int col = destroyedPart[1];
-        System.out.println("row: "+row+" col: "+col);
-        System.out.println("despues de shot: ");
-        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-        makeShot(row,col, 2);
-
-        System.out.println("Botes destruídos por jugador" + botBoard.getActualGameBoatsSunk());
-        System.out.println("El bot gano" + botBoard.isWinnner());
-
         if(!playerBoard.isWinnner()){
             disablePlayerBoard(false);
+            int[] destroyedPart;
+            destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
+            int row = destroyedPart[0];
+            int col = destroyedPart[1];
+            System.out.println("row: "+row+" col: "+col);
+            System.out.println("despues de shot: ");
+            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+            makeShot(row,col, 2);
+            System.out.println("player boarddddddddd\n"+playerBoard.showBoard(playerBoard.getBoard()));
+
+            System.out.println("Botes destruídos por jugador" + botBoard.getActualGameBoatsSunk());
+            System.out.println("El bot gano" + botBoard.isWinnner());
         }else{
             System.out.println("El jugador gano");
             disableBotBoard(true);
             disablePlayerBoard(true);
+            System.out.println("yepissss");
+            return;
         }
 
+        if(!botBoard.isWinnner()){
+            disableBotBoard(false);
+            setDisableShotCells();
+        }else{
+            System.out.println("El bot gano");
+            disableBotBoard(true);
+            disablePlayerBoard(true);
+            System.out.println("yepis");
+        }
+
+
+    }
+
+    public void setDisableShotCells(){
+        int num;
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+                num=botBoard.getNumberByIndex(botBoard.getBoard(),i,j);
+                if(num==-6||num==-1||num==-2||num==-3||num==-4){
+                    Node node = getNodeFromGridPane(botGridPane, j, i);
+                    node.setDisable(true);
+                }
+            }
+        }
     }
 
     public void prepareBotBoardForShot(){
@@ -515,7 +535,6 @@ public class GameController {
                         makeShot(col,row, 1);
                         disableBotBoard(true);
                         changeTurnToBot();
-
                     });
                 }
 
@@ -526,7 +545,7 @@ public class GameController {
     public void disableBotBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(botGridPane, i, j);
+                Node node = getNodeFromGridPane(botGridPane, j, i);
                 node.setDisable(disable);
             }
         }
@@ -534,7 +553,7 @@ public class GameController {
     public void disablePlayerBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(playerGridPane, i, j);
+                Node node = getNodeFromGridPane(playerGridPane, j, i);
                 node.setDisable(disable);
             }
         }
@@ -542,9 +561,8 @@ public class GameController {
 
     public void makeShot(int row, int col, int playerOrBot){
         boolean isDestroyed;
-        int type = 0;
+        int type;
         try{
-
             if(playerOrBot == 1){
                 System.out.println("Realiza el tiro player---------------------------------------------------------------");
                 playerBoard.shootInOtherBoard(botBoard,row,col);
@@ -578,23 +596,19 @@ public class GameController {
                     break;
             }
             if (playerOrBot==1){
-                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
-                System.out.println(row +col);
-
-                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
-                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
+//                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
+//                System.out.println(row +col);
+//
+//                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
+//                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
                 if(type !=(-6)){
 
-                    System.out.println("Hasta aqui llega");
-
-
+//                    System.out.println("Hasta aqui llega");
                     isDestroyed = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
-
-                    System.out.println("paso is destroted" + isDestroyed);
-
-                    System.out.println("shot in row "+row+" col "+col);
-                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
-                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
+//                    System.out.println("paso is destroted" + isDestroyed);
+//                    System.out.println("shot in row "+row+" col "+col);
+//                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
+//                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
                         playerBoard.boatSunk();
                         playerBoard.isWinnner();
@@ -606,37 +620,29 @@ public class GameController {
                     }
 
                 }else{
-
                     botGridPane.add(shot, col, row);
-
                 }
 
             }else{
-                if(type!=-6){
+                if(type!=(-6)){
                     System.out.println("Hasta aqui llega");
 
                     isDestroyed = playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
 
                     System.out.println("paso is destroted" + isDestroyed);
-
-
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
                         botBoard.boatSunk();
                         botBoard.isWinnner();
-                        makeBoatDestroyed(row, col,2);
+                        makeBoatDestroyed(row, col,1);
 
                     }else{
-
                         playerGridPane.add(shot, col, row);
-
                     }
 
                 }else{
-
                     playerGridPane.add(shot, col, row);
-
                 }
 
             }
@@ -658,17 +664,17 @@ public class GameController {
 
             }else{
                 boatType = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
-
+                System.out.println("si coge type: "+boatType);
+                System.out.println("fila: "+row+" columna: "+col);
                 boatUbication = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).getBoatUbication();
             }
             int endIndex = switch (boatType) {
                 case -1 -> 1;
-                case -2 -> 3;
-                case -3 -> 4;
-                case -4 -> 5;
+                case -2 -> 2;
+                case -3 -> 3;
+                case -4 -> 4;
                 default -> 0;
             };
-
 
             for(int i=0; i<endIndex; i++){
                 for (List<Integer> row2 : boatUbication) {
@@ -680,7 +686,9 @@ public class GameController {
                     shot.setFill(Color.YELLOW);
                     if(playerOrBot==1){
                         playerGridPane.add(shot, column, fila);
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
                     }else{
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
                         botGridPane.add(shot, column, fila);
                     }
                 }
@@ -689,6 +697,7 @@ public class GameController {
 
         }catch(GameException.OutOfBoardAction e){
             System.out.println(e.getMessage());
+            System.out.println("yep");
         }
 
     }
