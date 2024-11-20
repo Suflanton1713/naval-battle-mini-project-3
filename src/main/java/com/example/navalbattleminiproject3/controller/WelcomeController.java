@@ -17,6 +17,8 @@ public class WelcomeController {
     private ImageView imageCharacter;
     @FXML
     private Button buttonSide;
+    private Image selectedCharacter;
+
 
     private int currentImageIndex = 0;
     private final Image[] characterImages = {
@@ -40,9 +42,20 @@ public class WelcomeController {
     @FXML
     void handleClickPlay(ActionEvent event) {
         WelcomeView.deleteInstance();
-        GameView.getInstance().getGameController().startPlay();
 
+        // Obtener la instancia de GameView
+        GameView gameView = GameView.getInstance();
+
+        // Pasar la imagen seleccionada del jugador
+        gameView.setPlayerCharacter(characterImages[currentImageIndex]);
+
+        // Seleccionar y establecer una imagen aleatoria para el bot
+        gameView.setBotCharacter(characterImages);
+
+        // Iniciar el juego
+        gameView.getGameController().startPlay();
     }
+
     @FXML
     void initialize() {
         imageCharacter.setImage(characterImages[currentImageIndex]);
@@ -54,7 +67,16 @@ public class WelcomeController {
         currentImageIndex = (currentImageIndex + 1) % characterImages.length;
         imageCharacter.setImage(characterImages[currentImageIndex]);
         imageHologram.setImage(hologramImages[currentImageIndex]);
+
+        // Guardar la selección actual
+        selectedCharacter = characterImages[currentImageIndex];
     }
+
+    public Image getSelectedCharacter() {
+        return selectedCharacter;
+    }
+
+
 
 
 }

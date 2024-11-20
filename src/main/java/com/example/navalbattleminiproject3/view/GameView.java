@@ -33,7 +33,7 @@ public class GameView extends Stage {
         StopVideo();
 
         // Configurar la escena y ventana
-        Scene scene = new Scene(mainPane, 1300, 670);
+        Scene scene = new Scene(mainPane, 1200, 670);
         scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
         setScene(scene);
         setTitle("Sudoku");
@@ -70,5 +70,14 @@ public class GameView extends Stage {
         );
         timeline.setCycleCount(1); // Solo 1 ciclo
         timeline.play(); // Inicia el timeline
+    }
+
+    public void setPlayerCharacter(Image character) {
+        gameController.setPlayerCharacter(character);
+    }
+
+    public void setBotCharacter(Image[] botImages) {
+        int randomIndex = (int) (Math.random() * botImages.length);
+        gameController.setBotCharacter(botImages[randomIndex]);
     }
 }

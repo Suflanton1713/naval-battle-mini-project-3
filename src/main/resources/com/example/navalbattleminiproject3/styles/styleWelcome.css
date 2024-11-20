@@ -59,8 +59,18 @@
 .buttons{
     -fx-border-radius: 3px;
     -fx-border-width: 1px;
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+
 }
-.buttons:hover{
+#buttonSelectCharacter{
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-border-color: white;
+}
+#buttonSelectCharacter:hover, .buttons:hover{
     -fx-border-radius: 3px;
     -fx-border-width: 2px;
     -fx-border-color: #fafa4b;

@@ -8,3 +8,9 @@
     -fx-text-fill: #ffffff;
     -fx-cursor: "hand";
 }
+
+#GridGameBackground{
+    -fx-background-image: url('../images/backgrounds/gameBackground.png');
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}

@@ -11,6 +11,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -31,8 +33,8 @@ public class GameController {
     private BotBoard botBoard;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
-    private List<Pane> playerShips = new ArrayList<>(10);
-    private List<Pane> botShips = new ArrayList<>(10);
+    private List<StackPane> playerShips = new ArrayList<>(10);
+    private List<StackPane> botShips = new ArrayList<>(10);
     private List<Integer> temporaryNumberBoats = new ArrayList<>(10);
     private List<Pane> usedBotPaneShip = new ArrayList<>(10);
     int positionBotShipsToSetNull = 0;
@@ -66,6 +68,26 @@ public class GameController {
 
     @FXML
     private Button startButton;
+
+    @FXML
+    private ImageView imgPlayer;
+
+    @FXML
+    private ImageView imgBot;
+
+    // Método para establecer la imagen del bot
+    public void setBotCharacter(Image character) {
+        if (imgBot != null) {
+            imgBot.setImage(character);
+        }
+    }
+
+
+    public void setPlayerCharacter(Image character) {
+        if (imgPlayer != null) {
+            imgPlayer.setImage(character);
+        }
+    }
 
     @FXML
     void handleClickExit(ActionEvent event) {
@@ -150,17 +172,21 @@ public class GameController {
 
     public void createBoardShips(){
         for(int i = 0; i<10; i++){
-            Pane playerShip = createShip(temporaryNumberBoats.get(i),1);
-            Pane botShip = createShip(temporaryNumberBoats.get(i),2);
+            StackPane playerShip = (StackPane) createShip(temporaryNumberBoats.get(i),1);
+            StackPane botShip = (StackPane) createShip(temporaryNumberBoats.get(i),2);
+
+            //botShip.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
             playerShips.add(playerShip);
             botShips.add(botShip);
+
         }
     }
 
     public Pane createShip(int type, int playerOrBot) {
+
         StackPane root = new StackPane();
         root.setMinSize(type * 35, 35);
-        root.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
+        root.setStyle("-fx-border-color: blue; -fx-border-width: 2; -fx-border-style: solid;");
         for (int i = 0; i < type; i++) {
 
 
@@ -279,8 +305,7 @@ public class GameController {
                     }
                 }
             });
-//            makeDraggable(root);
-//            root.setOnMouseClicked(event -> rotateBoat(root));
+
         }
 
 
@@ -297,7 +322,7 @@ public class GameController {
         return -1;
     }
 
-    public void rotateBoat(Pane boat, int  playerOrBot) {
+    public void rotateBoat(StackPane boat, int  playerOrBot) {
         int actualAngle = (int) ((boat.getRotate() % 360 + 360) % 360);
         int shipType = getPlayerShipType(boat);
         System.out.println("Estoy a tanto de ángulo "+actualAngle);
@@ -426,7 +451,7 @@ public class GameController {
      public void positionBotShipWithDirection(int type, int row, int col){
 
              // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
-             Pane ship = getPaneOfShip(type, 2);
+             StackPane ship = getPaneOfShip(type, 2);
              if (ship == null) return;
 
              // Obtener la dirección del barco desde el tablero del bot
@@ -446,7 +471,7 @@ public class GameController {
 
      }
 
-    public Pane getPaneOfShip(int type, int playerOrBot) {
+    public StackPane getPaneOfShip(int type, int playerOrBot) {
 
         int startIndex ;
         int endIndex;
@@ -473,11 +498,11 @@ public class GameController {
                 return null;
         }
 
-        List<Pane> shipsList = (playerOrBot == 1) ? playerShips : botShips;
+        List<StackPane> shipsList = (playerOrBot == 1) ? playerShips : botShips;
 
         for (int i = startIndex; i < endIndex; i++) {
             if (shipsList.get(i) != null) {
-                Pane ship = shipsList.get(i);
+                StackPane ship = shipsList.get(i);
                 positionBotShipsToSetNull = i;
                 return ship;
 

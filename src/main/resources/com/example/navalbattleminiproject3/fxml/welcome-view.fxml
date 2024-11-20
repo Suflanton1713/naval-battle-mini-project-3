@@ -22,13 +22,20 @@
                   <Insets top="70.0" />
                </VBox.margin>
             </ImageView>
-            <Button fx:id="buttonSelectCharacter" mnemonicParsing="false" onAction="#handleSelectCharacter" prefHeight="26.0" prefWidth="107.0" text="Select character" />
-            <Button fx:id="buttonSide" mnemonicParsing="false" text="Side" />
-            <TextField id="nickNameTextField" alignment="CENTER" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="70.0" prefWidth="176.0" promptText="Your user..." style="-fx-prompt-text-fill: white;">
+            <Button fx:id="buttonSelectCharacter" mnemonicParsing="false" onAction="#handleSelectCharacter" prefHeight="26.0" prefWidth="133.0" text="Change character &gt;" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="8.0" />
+               </VBox.margin></Button>
+            <TextField id="nickNameTextField" alignment="CENTER" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="70.0" prefWidth="176.0" promptText="Join your user..." style="-fx-prompt-text-fill: white; -fx-text-fill: white;">
                <font>
                   <Font name="SansSerif Regular" size="20.0" />
                </font>
             </TextField>
+            <Button mnemonicParsing="false" style="-fx-background-color: #FFCE00FF;" text="Acept">
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+            </Button>
          </children>
       </VBox>
    </left>
@@ -57,31 +64,31 @@
          <children>
             <Button id="playButton" alignment="TOP_LEFT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#handleClickPlay" prefHeight="298.0" prefWidth="277.0" styleClass="buttons" text="New Game" textFill="WHITE" GridPane.rowSpan="2">
                <font>
-                  <Font name="SansSerif Bold" size="30.0" />
+                  <Font name="Tw Cen MT Condensed Extra Bold" size="40.0" />
                </font>
             </Button>
             <Button id="creditsButton" mnemonicParsing="false" prefHeight="71.0" prefWidth="257.0" styleClass="buttons" text="Credits" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <font>
-                  <Font name="SansSerif Bold" size="20.0" />
+                  <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                </font>
             </Button>
             <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
                <children>
                   <Button id="continueButton" alignment="TOP_LEFT" mnemonicParsing="false" prefHeight="108.0" prefWidth="259.0" styleClass="buttons" text="Continue" textFill="WHITE">
                      <font>
-                        <Font name="SansSerif Bold" size="20.0" />
+                        <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                      </font>
                   </Button>
                   <Button id="optionsButton" mnemonicParsing="false" prefHeight="119.0" prefWidth="258.0" styleClass="buttons" text="Options" textFill="WHITE">
                      <font>
-                        <Font name="SansSerif Bold" size="20.0" />
+                        <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                      </font>
                   </Button>
                </children>
             </VBox>
             <Button id="instructionButton" alignment="TOP_LEFT" mnemonicParsing="false" prefHeight="158.0" prefWidth="536.0" styleClass="buttons" text="Instructions" textFill="WHITE" GridPane.columnSpan="2" GridPane.rowIndex="2">
                <font>
-                  <Font name="SansSerif Bold" size="20.0" />
+                  <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                </font>
             </Button>
          </children>
