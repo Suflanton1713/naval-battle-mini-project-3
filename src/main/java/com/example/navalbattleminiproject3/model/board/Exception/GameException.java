@@ -18,21 +18,13 @@ public class GameException extends Exception {
         super(cause);
     }
 
-    public static class OutOfBoardAction extends Exception {
+    public static class OutOfBoardAction extends IndexOutOfBoundsException {
         public OutOfBoardAction() {
-            super();
+            super("You are making an action out of the board");
         }
 
         public OutOfBoardAction(String message) {
-            super(message);
-        }
-
-        public OutOfBoardAction(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public OutOfBoardAction(Throwable cause) {
-            super(cause);
+            super("You are making an action out of the board" + message);
         }
     }
 

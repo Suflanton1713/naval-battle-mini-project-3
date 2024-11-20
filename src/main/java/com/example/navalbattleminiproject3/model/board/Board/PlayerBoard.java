@@ -116,16 +116,14 @@ public class PlayerBoard extends BoardAdapter{
     }
 
     public boolean isWinnner(){
+        if((actualGameBoatsSunk >= 10)){
+            winner = true;
+        }
         return winner;
     }
 
-    public void winMatch(){
-        if((actualGameBoatsSunk == 10)){
-            winner = true;
-        }
-    }
-
     public void boatSunk(){
+        System.out.println("El jugador hundió un bote");
         actualGameBoatsSunk++;
         boatsSunkEver++;
     }
