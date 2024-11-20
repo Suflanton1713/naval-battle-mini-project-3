@@ -3,15 +3,21 @@ package com.example.navalbattleminiproject3.controller;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
+import com.example.navalbattleminiproject3.model.board.GameData.PlayerDataHandler;
+import com.example.navalbattleminiproject3.model.board.GameData.SerializableGameData;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import com.example.navalbattleminiproject3.view.GameView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -27,6 +33,7 @@ import java.util.List;
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
+    private PlayerDataHandler playerDataHandler;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
     private List<Pane> playerPaneShips = new ArrayList<>(10);
@@ -74,6 +81,7 @@ public class GameController {
 
     @FXML
     public void initialize() {
+        playerDataHandler = new PlayerDataHandler();
         Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
         playerBoard = new PlayerBoard();
         botBoard = new BotBoard();
@@ -467,7 +475,7 @@ public class GameController {
             ship.setMouseTransparent(true);
         }
 
-        System.out.println("Botes destruídos por jugador" + playerBoard.getActualGameBoatsSunk());
+        System.out.println("Botes destruídos por jugador " + playerBoard.getActualGameBoatsSunk() + " y siempre " +playerBoard.getBoatsSunkEver());
         System.out.println("El jugador gano" + playerBoard.isWinnner());
 
         System.out.println("Botes destruídos por bot" + botBoard.getActualGameBoatsSunk());
@@ -475,8 +483,9 @@ public class GameController {
 
         if(!playerBoard.isWinnner()){
             disablePlayerBoard(false);
+            disableBotBoard(true);
 
-            PauseTransition pause = new PauseTransition(Duration.seconds(2)); // 2 segundos de pausa
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.5)); // 2 segundos de pausa
             pause.setOnFinished(event -> {
                 int[] destroyedPart;
                 destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
@@ -499,31 +508,22 @@ public class GameController {
                     System.out.println("El bot ganó");
                     disableBotBoard(true);
                     disablePlayerBoard(true);
+                    win(2);
                     System.out.println("Juego terminado");
                 }
+
+
             });
 
             pause.play();
 
-        }else{
+        }else {
             System.out.println("El jugador gano");
             disableBotBoard(true);
             disablePlayerBoard(true);
+            win(1);
             System.out.println("yepissss");
-            return;
         }
-
-        if(!botBoard.isWinnner()){
-            disableBotBoard(false);
-            setDisableShotCells();
-        }else{
-            System.out.println("El bot gano");
-            disableBotBoard(true);
-            disablePlayerBoard(true);
-            System.out.println("yepis");
-        }
-
-
     }
 
     public void setDisableShotCells(){
@@ -735,6 +735,8 @@ public class GameController {
     }
 
 
+
+
 //    public void makeDraggable(Node node) {
 //        // Variables para almacenar las coordenadas iniciales del nodo
 //        final double[] initialTranslateX = {0};
@@ -757,6 +759,56 @@ public class GameController {
 //            node.setTranslateY(initialTranslateY[0] + deltaY);
 //        });
 //    }
+public void win(int playerOrBot) {
+    playerBoard.restartGame();
+    botBoard.restartGame();
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("YOU WON! CONGRATULATIONS!");
+    alert.setHeaderText(null);
+    alert.setGraphic(null);
+    alert.setContentText(null);
+    DialogPane dialogPane = alert.getDialogPane();
+    ButtonType okButtonType = ButtonType.OK;
+    Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
+    Label resultsLabel = new Label();
+    if (playerOrBot == 1) {
+        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos" + playerBoard.getBoatsSunkEver());
+    } else {
+        resultsLabel.setText("Felicidades Robii" + "Puntos " + botBoard.getActualGameBoatsSunk());
+    }
+    okButton.setStyle(
+            "-fx-background-color: purple; " +
+                    "-fx-text-fill: white; " +
+                    "-fx-font-size: 25px;"
+    );
+    resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+            "-fx-text-fill: black; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 32px;");
+
+    VBox content = new VBox();
+    content.getChildren().add(resultsLabel);
+    content.setStyle("-fx-alignment: center;");
+    VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
+
+    content.setAlignment(Pos.BOTTOM_CENTER);
+    alert.getDialogPane().setContent(content);
+    dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
+    dialogPane.getStyleClass().add("mi-alerta");
+    alert.show();
+
+//        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+//            AddPetal(dialogPane);
+//        }));
+//
+//        timeline.setCycleCount(10);
+//        timeline.play();
+
+    playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+
+
+
+}
 
     public void startPlay() {
         createBotTable();
