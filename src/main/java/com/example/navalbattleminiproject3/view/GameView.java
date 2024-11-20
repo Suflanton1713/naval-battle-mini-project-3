@@ -62,19 +62,13 @@ public class GameView extends Stage {
     }
 
     private void StopVideo() {
-        // Configura un Timeline para detener el video después de 1.6 segundos
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(1600), event -> {
-                    // Aquí se puede realizar cualquier acción, si es necesario.
+                new KeyFrame(Duration.millis(100), event -> {
+                    mainPane.getChildren().clear();
+                    mainPane.getChildren().add(root);
                 })
         );
-        timeline.setCycleCount(1); // Solo un ciclo
-        timeline.setOnFinished(event -> {
-            // Detener el video y mostrar la vista principal
-            mainPane.getChildren().clear();
-            mainPane.getChildren().add(root);
-        });
-        timeline.play(); // Asegúrate de llamar al play para que inicie la animación
+        timeline.setCycleCount(1); // Solo 1 ciclo
+        timeline.play(); // Inicia el timeline
     }
-
 }
