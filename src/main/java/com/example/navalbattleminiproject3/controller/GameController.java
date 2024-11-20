@@ -6,6 +6,7 @@ import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import com.example.navalbattleminiproject3.view.GameView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
+import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -474,18 +475,36 @@ public class GameController {
 
         if(!playerBoard.isWinnner()){
             disablePlayerBoard(false);
-            int[] destroyedPart;
-            destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
-            int row = destroyedPart[0];
-            int col = destroyedPart[1];
-            System.out.println("row: "+row+" col: "+col);
-            System.out.println("despues de shot: ");
-            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-            makeShot(row,col, 2);
-            System.out.println("player boarddddddddd\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
-            System.out.println("Botes destruídos por jugador" + botBoard.getActualGameBoatsSunk());
-            System.out.println("El bot gano" + botBoard.isWinnner());
+            PauseTransition pause = new PauseTransition(Duration.seconds(2)); // 2 segundos de pausa
+            pause.setOnFinished(event -> {
+                int[] destroyedPart;
+                destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
+                int row = destroyedPart[0];
+                int col = destroyedPart[1];
+                System.out.println("row: " + row + " col: " + col);
+                System.out.println("Después del disparo: ");
+                System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+                makeShot(row, col, 2);
+                System.out.println("Tablero del jugador\n" + playerBoard.showBoard(playerBoard.getBoard()));
+
+                System.out.println("Botes destruidos por jugador: " + botBoard.getActualGameBoatsSunk());
+                System.out.println("El bot ganó: " + botBoard.isWinnner());
+
+                // Verificar si el juego terminó
+                if (!botBoard.isWinnner()) {
+                    disableBotBoard(false);
+                    setDisableShotCells();
+                } else {
+                    System.out.println("El bot ganó");
+                    disableBotBoard(true);
+                    disablePlayerBoard(true);
+                    System.out.println("Juego terminado");
+                }
+            });
+
+            pause.play();
+
         }else{
             System.out.println("El jugador gano");
             disableBotBoard(true);
