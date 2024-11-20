@@ -3,10 +3,7 @@ package com.example.navalbattleminiproject3.controller;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
-import com.example.navalbattleminiproject3.view.GameView;
-import com.example.navalbattleminiproject3.view.HalconView;
-import com.example.navalbattleminiproject3.view.StarView;
-import com.example.navalbattleminiproject3.view.WelcomeView;
+import com.example.navalbattleminiproject3.view.*;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -164,16 +161,14 @@ public class GameController {
         StackPane root = new StackPane();
         root.setMinSize(type * 35, 35);
         root.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
-
         for (int i = 0; i < type; i++) {
+
+
             if(type == 1){
                 StarView star= new StarView();
                 Group starRoot = star.getRoot();
-                //starRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                starRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
                 starRoot.setLayoutY(0);
-
-                // Ajustar el tamaño y la posición dentro de la celda
-
                 starRoot.setScaleX(0.17);
                 starRoot.setScaleY(0.17);
 
@@ -183,7 +178,7 @@ public class GameController {
             } else if (type == 2) {
                 HalconView halcon = new HalconView();
                 Group halconRoot = halcon.getRoot();
-                //halconRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                halconRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
                 halconRoot.setLayoutY(0);
 
                 // Ajustar el tamaño y la posición dentro de la celda
@@ -195,8 +190,33 @@ public class GameController {
                 root.getChildren().add(halconRoot);
 
             } else if (type == 3) {
+                AlaView ala = new AlaView();
+                Group AlaRoot = ala.getRoot();
+                AlaRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                AlaRoot.setLayoutY(0);
+
+                // Ajustar el tamaño y la posición dentro de la celda
+
+                AlaRoot.setScaleX(0.3);
+                AlaRoot.setScaleY(0.25);
+
+                // Añadir al barco
+                root.getChildren().add(AlaRoot);
+
 
             } else if (type == 4) {
+                DestructorView destructor = new DestructorView();
+                Group destructorRoot = destructor.getRoot();
+                destructorRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                destructorRoot.setLayoutY(0);
+
+                // Ajustar el tamaño y la posición dentro de la celda
+
+                destructorRoot.setScaleX(0.4);
+                destructorRoot.setScaleY(0.25);
+
+                // Añadir al barco
+                root.getChildren().add(destructorRoot);
 
             }
 
@@ -281,7 +301,7 @@ public class GameController {
         int actualAngle = (int) ((boat.getRotate() % 360 + 360) % 360);
         int shipType = getPlayerShipType(boat);
         System.out.println("Estoy a tanto de ángulo "+actualAngle);
-        if(shipType == 1){
+        if(shipType == 1 ){
             if (actualAngle == 0){
             boat.setTranslateX(0);
             boat.setTranslateY(0);
@@ -298,23 +318,28 @@ public class GameController {
             boat.setTranslateY(0);
         }}
 
-        if(shipType == 2){
-            if (actualAngle == 0){
-            boat.setTranslateX(-17);
-            boat.setTranslateY(17);
+        if(shipType == 2 ){
+                if (actualAngle == 0) {
+                    boat.setTranslateX(-17);
+                    boat.setTranslateY(17);
+                } else if (actualAngle == 90) {
+                    boat.setTranslateX(-35);
+                    boat.setTranslateY(0);
+                } else if (actualAngle == 180) {
+                    boat.setTranslateX(-17);
+                    boat.setTranslateY(-17);
+                } else if (actualAngle == 270) {
+                    boat.setTranslateX(0);
+                    boat.setTranslateY(0);
+                }
+
+
+                if (actualAngle == 0) {
+                    boat.setTranslateX(-17);
+                    boat.setTranslateY(17);
+                }
         }
-        else if (actualAngle == 90){
-            boat.setTranslateX(-35);
-            boat.setTranslateY(0);
-        } else if (actualAngle == 180) {
-            boat.setTranslateX(-17);
-            boat.setTranslateY(-17);
-        }
-        else if (actualAngle == 270) {
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }}
-        if(shipType == 3){
+        if(shipType == 3 ){
             if (actualAngle == 0){
                 boat.setTranslateX(-35);
                 boat.setTranslateY(35);
@@ -331,7 +356,7 @@ public class GameController {
                 boat.setTranslateY(0);
             }}
 
-        if(shipType == 4){
+        if(shipType == 4 ){
             if (actualAngle == 0){
                 boat.setTranslateX(-17);
                 boat.setTranslateY(17);
@@ -369,7 +394,6 @@ public class GameController {
         if (actualAngle > 360) {
             actualAngle = actualAngle % 360;
         }
-
         return switch (actualAngle) {
             case 0 -> 0;
             case 90 -> 3;
@@ -377,11 +401,8 @@ public class GameController {
             case 270 -> 1;
             default -> -1;
         };
-
     }
-
     public void createBotTable(){
-
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 Rectangle rect = new Rectangle(35, 35);
@@ -390,7 +411,6 @@ public class GameController {
                 botGridPane.add(rect, j, i);
             }
         }
-
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 int shipType = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
@@ -402,29 +422,28 @@ public class GameController {
                 }
             }
         }
-
-
     }
      public void positionBotShipWithDirection(int type, int row, int col){
-        Pane ship = getPaneOfShip(type,2);
-        int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
-         System.out.println("tipo de barco que se agarró: "+type+" direccion: "+boardDirection
-         + " fila: "+row+" column: "+col);
-        if (boardDirection==0|| boardDirection==2){
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
-            placeBoatInCell(ship,row,col,botGridPane);
-            usedBotPaneShip.add(ship);
-            botShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
 
-        }else{
-            rotateBoat(ship, 2);
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
-            placeBoatInCell(ship,row,col,botGridPane);
-            usedBotPaneShip.add(ship);
-            botShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
-        }
+             // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
+             Pane ship = getPaneOfShip(type, 2);
+             if (ship == null) return;
+
+             // Obtener la dirección del barco desde el tablero del bot
+             int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+
+             // Rotar el barco si es necesario antes de colocarlo
+             if (boardDirection == 1 || boardDirection == 3) {
+                 rotateBoat(ship, 2);
+             }
+
+             // Colocar el barco de manera consistente en el grid
+             placeBoatInCell(ship, row, col, botGridPane);
+             usedBotPaneShip.add(ship);
+
+             // Marcar este barco como usado en la lista de barcos del bot
+             botShips.set(positionBotShipsToSetNull, null);
+
      }
 
     public Pane getPaneOfShip(int type, int playerOrBot) {
@@ -674,34 +693,8 @@ public class GameController {
             }
         }
     }
-
-
-//    public void makeDraggable(Node node) {
-//        // Variables para almacenar las coordenadas iniciales del nodo
-//        final double[] initialTranslateX = {0};
-//        final double[] initialTranslateY = {0};
-//
-//        // Evento para registrar las coordenadas iniciales
-//        node.setOnMousePressed(mouseEvent -> {
-//            mouseAnchorX = mouseEvent.getSceneX();
-//            mouseAnchorY = mouseEvent.getSceneY();
-//            initialTranslateX[0] = node.getTranslateX();
-//            initialTranslateY[0] = node.getTranslateY();
-//        });
-//
-//        // Evento para actualizar la posición del nodo mientras se arrastra
-//        node.setOnMouseDragged(mouseEvent -> {
-//            double deltaX = mouseEvent.getSceneX() - mouseAnchorX;
-//            double deltaY = mouseEvent.getSceneY() - mouseAnchorY;
-//
-//            node.setTranslateX(initialTranslateX[0] + deltaX);
-//            node.setTranslateY(initialTranslateY[0] + deltaY);
-//        });
-//    }
-
     public void startPlay() {
         createBotTable();
         createPlayerTable();
     }
-
 }

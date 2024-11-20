@@ -60,4 +60,9 @@
     -fx-border-radius: 3px;
     -fx-border-width: 1px;
 }
+.buttons:hover{
+    -fx-border-radius: 3px;
+    -fx-border-width: 2px;
+    -fx-border-color: #fafa4b;
+}
 
