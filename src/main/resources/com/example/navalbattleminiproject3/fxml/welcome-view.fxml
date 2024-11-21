@@ -74,7 +74,7 @@
             </Button>
             <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
                <children>
-                  <Button id="continueButton" alignment="TOP_LEFT" mnemonicParsing="false" prefHeight="108.0" prefWidth="259.0" styleClass="buttons" text="Continue" textFill="WHITE">
+                  <Button id="continueButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleClickContinue" prefHeight="108.0" prefWidth="259.0" styleClass="buttons" text="Continue" textFill="WHITE">
                      <font>
                         <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                      </font>

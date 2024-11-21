@@ -415,7 +415,7 @@
          <children>
             <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleClickStart" prefHeight="55.0" prefWidth="154.0" text="empezar disparos" />
          </children></VBox>
-      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="60.0" GridPane.rowIndex="1" GridPane.rowSpan="2">
+      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="60.0" GridPane.rowIndex="1">
          <children>
             <StackPane fx:id="stackPane1" prefHeight="35.0" prefWidth="200.0">
                <VBox.margin>
