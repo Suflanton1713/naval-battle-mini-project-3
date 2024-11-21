@@ -76,6 +76,7 @@ public class Boats implements Serializable {
         return partsDestroyed;
     }
 
+
     public void setPartsDestroyed(int partsDestroyed) {
         this.partsDestroyed = partsDestroyed;
     }
@@ -104,7 +105,7 @@ public class Boats implements Serializable {
     public boolean isBoatDestroyed(){
         System.out.println("Boat damaged at" + boatDamaged);
         if(!(boatDamaged.contains(""))){
-            System.out.println("Boat has not damaged parts left");
+            System.out.println("Boat has all his parts damaged  ");
             boatDestroyed = true;
 
         }
@@ -116,7 +117,17 @@ public class Boats implements Serializable {
 
         try{
             String damageUbication = String.valueOf(row) + String.valueOf(column);
-            if(!(boatUbication.contains(damageUbication))){
+            boolean isBoatPartExisting = false;
+            System.out.println("Ubicación del daño, " + damageUbication);
+            for (int i = 0; i < boatUbication.size(); i++) {
+                System.out.println("Imprimiendo partes del bote" + i);
+                System.out.println(boatUbication.get(i).get(0) + boatUbication.get(i).get(1));
+
+                    if(Integer.parseInt(String.valueOf(boatUbication.get(i).get(0)) + String.valueOf(boatUbication.get(i).get(1))) == Integer.parseInt(damageUbication)){
+                        isBoatPartExisting = true;
+                }
+            }
+            if(!(isBoatPartExisting)){
                 throw new GameException.InaccessiblePartInBoat("Trying to destroy a non-existence part in boat");
             }
 

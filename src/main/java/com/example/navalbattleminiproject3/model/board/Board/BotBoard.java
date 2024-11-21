@@ -17,6 +17,8 @@ public class BotBoard extends BoardAdapter {
 
     int actualGameBoatsSunk;
 
+    boolean winner;
+
     public BotBoard() {
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
@@ -57,6 +59,14 @@ public class BotBoard extends BoardAdapter {
 
     public List<List<Boats>> getBoardWithBoats() {
         return boardWithBoats;
+    }
+
+    public void setActualGameBoatsSunk(int actualGameBoatsSunk) {
+        this.actualGameBoatsSunk = actualGameBoatsSunk;
+    }
+
+    public int getActualGameBoatsSunk() {
+        return actualGameBoatsSunk;
     }
 
     public void setBoardWithBoats(List<List<Boats>> boardWithBoats) {
@@ -181,11 +191,11 @@ public class BotBoard extends BoardAdapter {
 
 
         //Higher than 0 coz all the negative numbers represent already shooted boxes
-        if(boxNumber > 0){
-            setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), randomRow, randomCol);
+        if(boxNumber > 0) {
+            setNumberByIndex(attackedBoard.getBoard(), ((-1) * boxNumber), randomRow, randomCol);
             modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), randomRow, randomCol);
+            System.out.println("Destruímos boat parts");
             modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
-            isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             destroyedPart[0] = randomRow;
             destroyedPart[1] = randomCol;
             return destroyedPart;
@@ -199,9 +209,14 @@ public class BotBoard extends BoardAdapter {
     }
 
     public boolean isWinnner(){
-        return (actualGameBoatsSunk == 10);
+        if((actualGameBoatsSunk >= 10)){
+            winner = true;
+        }
+        return winner;
     }
+
     public void boatSunk(){
+        System.out.println("El bot hundió un bote");
         actualGameBoatsSunk++;
     }
 

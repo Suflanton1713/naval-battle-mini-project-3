@@ -3,6 +3,7 @@ package com.example.navalbattleminiproject3.model.board.Board;
 
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
+import jdk.swing.interop.SwingInterOpUtils;
 
 import java.util.List;
 
@@ -94,7 +95,11 @@ public interface IBoard {
     default <T> T getObjectByIndex(List<List<T>> board, int row, int column) {
         try {
 
+            System.out.println("Antes de la comprobación de getObjectByIndex");
+
             accessingBoardComprobation(board, row, column);
+
+            System.out.println("Después y return,  " + board.get(row).get(column));
 
             return board.get(row).get(column);
         } catch (GameException.NoBoardFound | GameException.OutOfBoardPosition e) {

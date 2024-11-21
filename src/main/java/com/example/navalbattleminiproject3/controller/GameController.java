@@ -1,40 +1,34 @@
 package com.example.navalbattleminiproject3.controller;
-
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
+import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import com.example.navalbattleminiproject3.view.*;
+import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
-    private List<StackPane> playerShips = new ArrayList<>(10);
-    private List<StackPane> botShips = new ArrayList<>(10);
+    private List<StackPane> playerPaneShips = new ArrayList<>(10);
+    private List<StackPane> botPaneShips = new ArrayList<>(10);
     private List<Integer> temporaryNumberBoats = new ArrayList<>(10);
     private List<Pane> usedBotPaneShip = new ArrayList<>(10);
     int positionBotShipsToSetNull = 0;
@@ -43,8 +37,6 @@ public class GameController {
     private double mouseAnchorX;
     private double mouseAnchorY;
     private boolean isWatchBotBoardOn = false;
-
-
     @FXML
     private VBox shipsVBox;
 
@@ -113,32 +105,32 @@ public class GameController {
           switch (type) {
             case 1:
                 for (int i = 0; i < 4; i++) {
-                    if (!(usedPlayerPanes.contains(playerShips.get(i)))) {
-                        stackPane1.getChildren().add(playerShips.get(i));
+                    if (!(usedPlayerPanes.contains(playerPaneShips.get(i)))) {
+                        stackPane1.getChildren().add(playerPaneShips.get(i));
                         break;
                     }
                 }
                 break;
             case 2:
                 for (int i = 4; i < 7; i++) {
-                    if (!(usedPlayerPanes.contains(playerShips.get(i)))) {
-                        stackPane2.getChildren().add(playerShips.get(i));
+                    if (!(usedPlayerPanes.contains(playerPaneShips.get(i)))) {
+                        stackPane2.getChildren().add(playerPaneShips.get(i));
                         break;
                     }
                 }
                 break;
             case 3:
                 for (int i = 7; i < 9; i++) {
-                    if (!(usedPlayerPanes.contains(playerShips.get(i)))) {
-                        stackPane3.getChildren().add(playerShips.get(i));
+                    if (!(usedPlayerPanes.contains(playerPaneShips.get(i)))) {
+                        stackPane3.getChildren().add(playerPaneShips.get(i));
                         break;
                     }
                 }
                 break;
             case 4:
                 for (int i = 9; i < 10; i++) {
-                    if (!(usedPlayerPanes.contains(playerShips.get(i)))) {
-                        stackPane4.getChildren().add(playerShips.get(i));
+                    if (!(usedPlayerPanes.contains(playerPaneShips.get(i)))) {
+                        stackPane4.getChildren().add(playerPaneShips.get(i));
                         break;
                     }
                 }
@@ -150,8 +142,8 @@ public class GameController {
 
     public String showArrayBotShips() {
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < botShips.size(); i++) {
-            Pane pane = botShips.get(i);
+        for (int i = 0; i < botPaneShips.size(); i++) {
+            Pane pane = botPaneShips.get(i);
             result.append("Pane ").append(i + 1).append(": ")
                     .append(pane != null ? pane.toString() : "null").append("\n");
         }
@@ -174,15 +166,12 @@ public class GameController {
         for(int i = 0; i<10; i++){
             StackPane playerShip = (StackPane) createShip(temporaryNumberBoats.get(i),1);
             StackPane botShip = (StackPane) createShip(temporaryNumberBoats.get(i),2);
-
-            //botShip.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
-            playerShips.add(playerShip);
-            botShips.add(botShip);
-
+            playerPaneShips.add(playerShip);
+            botPaneShips.add(botShip);
         }
     }
 
-    public Pane createShip(int type, int playerOrBot) {
+    public StackPane createShip(int type, int playerOrBot) {
 
         StackPane root = new StackPane();
         root.setMinSize(type * 35, 35);
@@ -191,7 +180,7 @@ public class GameController {
 
 
             if(type == 1){
-                StarView star= new StarView();
+                StarView star = new StarView();
                 Group starRoot = star.getRoot();
                 starRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
                 starRoot.setLayoutY(0);
@@ -248,21 +237,18 @@ public class GameController {
 
             root.setPrefSize(type * 35, 35);
         }
-
-
-
         root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         if(playerOrBot == 1){
             root.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.R) {
                     rotateBoat(root,1);
+
                 }
             });
 
             root.setOnMouseClicked(event -> {
                 root.requestFocus();
             });
-
             root.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 for (Node node : root.getChildren()) {
                     if (node instanceof Group) {
@@ -279,7 +265,7 @@ public class GameController {
             });
 
             playerGridPane.setOnMouseClicked(event -> {
-                for (Pane ship : playerShips) {
+                for (Pane ship : playerPaneShips) {
 
                     if ( ship.isFocused()) {
                         int col = (int) (event.getX() / 35);
@@ -287,6 +273,7 @@ public class GameController {
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
                             if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
+
                                 placeBoatInCell(ship, row, col, playerGridPane);
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
@@ -305,17 +292,16 @@ public class GameController {
                     }
                 }
             });
-
         }
-
-
         return root;
     }
 
-
     public int getPlayerShipType(Pane ship){
-        for (int i = 0; i < playerShips.size(); i++) {
-            if (playerShips.get(i) == ship) {
+        for (int i = 0; i < playerPaneShips.size(); i++) {
+            if (playerPaneShips.get(i) == ship) {
+                return temporaryNumberBoats.get(i);
+            }
+            if (botPaneShips.get(i) == ship) {
                 return temporaryNumberBoats.get(i);
             }
         }
@@ -324,45 +310,46 @@ public class GameController {
 
     public void rotateBoat(StackPane boat, int  playerOrBot) {
         int actualAngle = (int) ((boat.getRotate() % 360 + 360) % 360);
-        int shipType = getPlayerShipType(boat);
         System.out.println("Estoy a tanto de ángulo "+actualAngle);
+        int shipType = getPlayerShipType(boat);
+
         if(shipType == 1 ){
             if (actualAngle == 0){
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }
-        else if (actualAngle == 90){
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        } else if (actualAngle == 180) {
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }
-        else if (actualAngle == 270) {
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }}
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 90){
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }}
 
         if(shipType == 2 ){
-                if (actualAngle == 0) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(17);
-                } else if (actualAngle == 90) {
-                    boat.setTranslateX(-35);
-                    boat.setTranslateY(0);
-                } else if (actualAngle == 180) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(-17);
-                } else if (actualAngle == 270) {
-                    boat.setTranslateX(0);
-                    boat.setTranslateY(0);
-                }
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-35);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(-17);
+            } else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
 
 
-                if (actualAngle == 0) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(17);
-                }
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            }
         }
         if(shipType == 3 ){
             if (actualAngle == 0){
@@ -373,32 +360,30 @@ public class GameController {
                 boat.setTranslateX(0);
                 boat.setTranslateY(0);
             } else if (actualAngle == 180) {
-                boat.setTranslateX(0);
-                boat.setTranslateY(0);
+                boat.setTranslateX(-35);
+                boat.setTranslateY(-35);
             }
             else if (actualAngle == 270) {
                 boat.setTranslateX(0);
                 boat.setTranslateY(0);
             }}
 
-        if(shipType == 4 ){
-            if (actualAngle == 0){
-                boat.setTranslateX(-17);
-                boat.setTranslateY(17);
-            }
-            else if (actualAngle == 90){
-                boat.setTranslateX(-35);
+        if(shipType == 4 ) {
+            if (actualAngle == 0) {
+                boat.setTranslateX(-52);
+                boat.setTranslateY(52);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-105);
                 boat.setTranslateY(0);
             } else if (actualAngle == 180) {
-                boat.setTranslateX(-17);
-                boat.setTranslateY(-17);
+                boat.setTranslateX(-52);
+                boat.setTranslateY(-52);
             }
-            else if (actualAngle == 270) {
-                boat.setTranslateX(0);
-                boat.setTranslateY(0);
-            }}
+        }
+
 
         boat.setDisable(true);
+
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(300), boat);
         rotateTransition.setByAngle(90);
         rotateTransition.setOnFinished(event -> {
@@ -413,12 +398,15 @@ public class GameController {
     }
 
 
+
+
     public int getShipDirection(Pane ship) {
         int actualAngle = (int) ((ship.getRotate() % 360 + 360) % 360);
 
         if (actualAngle > 360) {
             actualAngle = actualAngle % 360;
         }
+
         return switch (actualAngle) {
             case 0 -> 0;
             case 90 -> 3;
@@ -426,8 +414,11 @@ public class GameController {
             case 270 -> 1;
             default -> -1;
         };
+
     }
+
     public void createBotTable(){
+
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 Rectangle rect = new Rectangle(35, 35);
@@ -436,6 +427,7 @@ public class GameController {
                 botGridPane.add(rect, j, i);
             }
         }
+
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 int shipType = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
@@ -447,28 +439,29 @@ public class GameController {
                 }
             }
         }
+
+
     }
      public void positionBotShipWithDirection(int type, int row, int col){
+        StackPane ship = getPaneOfShip(type,2);
+        int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+         System.out.println("tipo de barco que se agarró: "+type+" direccion: "+boardDirection
+         + " fila: "+row+" column: "+col);
+        if (boardDirection==0|| boardDirection==2){
+            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
+            placeBoatInCell(ship,row,col,botGridPane);
+            usedBotPaneShip.add(ship);
+            botPaneShips.set(positionBotShipsToSetNull, null);
+            System.out.println("despues de posicionar: "+ showArrayBotShips());
 
-             // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
-             StackPane ship = getPaneOfShip(type, 2);
-             if (ship == null) return;
-
-             // Obtener la dirección del barco desde el tablero del bot
-             int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
-
-             // Rotar el barco si es necesario antes de colocarlo
-             if (boardDirection == 1 || boardDirection == 3) {
-                 rotateBoat(ship, 2);
-             }
-
-             // Colocar el barco de manera consistente en el grid
-             placeBoatInCell(ship, row, col, botGridPane);
-             usedBotPaneShip.add(ship);
-
-             // Marcar este barco como usado en la lista de barcos del bot
-             botShips.set(positionBotShipsToSetNull, null);
-
+        }else{
+            rotateBoat(ship, 2);
+            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
+            placeBoatInCell(ship,row,col,botGridPane);
+            usedBotPaneShip.add(ship);
+            botPaneShips.set(positionBotShipsToSetNull, null);
+            System.out.println("despues de posicionar: "+ showArrayBotShips());
+        }
      }
 
     public StackPane getPaneOfShip(int type, int playerOrBot) {
@@ -498,7 +491,7 @@ public class GameController {
                 return null;
         }
 
-        List<StackPane> shipsList = (playerOrBot == 1) ? playerShips : botShips;
+        List<StackPane> shipsList = (playerOrBot == 1) ? playerPaneShips : botPaneShips;
 
         for (int i = startIndex; i < endIndex; i++) {
             if (shipsList.get(i) != null) {
@@ -537,7 +530,7 @@ public class GameController {
     }
 
     public void handleMouseEnter(Rectangle rect, int row, int col) {
-        for (Pane ship : playerShips) {
+        for (Pane ship : playerPaneShips) {
             if (ship != null && ship.isFocused()) {
                 int shipType = getPlayerShipType(ship);
                 int shipDirection = getShipDirection(ship);
@@ -587,7 +580,7 @@ public class GameController {
     }
 
     public void handleMouseExit(Rectangle rect, int row, int col) {
-        for (Pane ship : playerShips) {
+        for (Pane ship : playerPaneShips) {
             if (ship != null && ship.isFocused()) {
                 int shipType = getPlayerShipType(ship);
                 int shipDirection = getShipDirection(ship);
@@ -614,16 +607,77 @@ public class GameController {
         for (Pane ship : usedPlayerPanes) {
             ship.setMouseTransparent(true);
         }
-        int[] destroyedPart;
-        destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
-        int row = destroyedPart[0];
-        int col = destroyedPart[1];
-        System.out.println("row: "+row+" col: "+col);
-        System.out.println("despues de shot: ");
-        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-        makeShot(row,col, 2);
 
-        disableBotBoard(false);
+        System.out.println("Botes destruídos por jugador" + playerBoard.getActualGameBoatsSunk());
+        System.out.println("El jugador gano" + playerBoard.isWinnner());
+
+        System.out.println("Botes destruídos por bot" + botBoard.getActualGameBoatsSunk());
+        System.out.println("El jugador gano" + botBoard.isWinnner());
+
+        if(!playerBoard.isWinnner()){
+            disablePlayerBoard(false);
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(2)); // 2 segundos de pausa
+            pause.setOnFinished(event -> {
+                int[] destroyedPart;
+                destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
+                int row = destroyedPart[0];
+                int col = destroyedPart[1];
+                System.out.println("row: " + row + " col: " + col);
+                System.out.println("Después del disparo: ");
+                System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+                makeShot(row, col, 2);
+                System.out.println("Tablero del jugador\n" + playerBoard.showBoard(playerBoard.getBoard()));
+
+                System.out.println("Botes destruidos por jugador: " + botBoard.getActualGameBoatsSunk());
+                System.out.println("El bot ganó: " + botBoard.isWinnner());
+
+                // Verificar si el juego terminó
+                if (!botBoard.isWinnner()) {
+                    disableBotBoard(false);
+                    setDisableShotCells();
+                } else {
+                    System.out.println("El bot ganó");
+                    disableBotBoard(true);
+                    disablePlayerBoard(true);
+                    System.out.println("Juego terminado");
+                }
+            });
+
+            pause.play();
+
+        }else{
+            System.out.println("El jugador gano");
+            disableBotBoard(true);
+            disablePlayerBoard(true);
+            System.out.println("yepissss");
+            return;
+        }
+
+        if(!botBoard.isWinnner()){
+            disableBotBoard(false);
+            setDisableShotCells();
+        }else{
+            System.out.println("El bot gano");
+            disableBotBoard(true);
+            disablePlayerBoard(true);
+            System.out.println("yepis");
+        }
+
+
+    }
+
+    public void setDisableShotCells(){
+        int num;
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+                num=botBoard.getNumberByIndex(botBoard.getBoard(),i,j);
+                if(num==-6||num==-1||num==-2||num==-3||num==-4){
+                    Node node = getNodeFromGridPane(botGridPane, j, i);
+                    node.setDisable(true);
+                }
+            }
+        }
     }
 
     public void prepareBotBoardForShot(){
@@ -651,7 +705,7 @@ public class GameController {
     public void disableBotBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(botGridPane, i, j);
+                Node node = getNodeFromGridPane(botGridPane, j, i);
                 node.setDisable(disable);
             }
         }
@@ -659,51 +713,174 @@ public class GameController {
     public void disablePlayerBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(playerGridPane, i, j);
+                Node node = getNodeFromGridPane(playerGridPane, j, i);
                 node.setDisable(disable);
             }
         }
     }
 
     public void makeShot(int row, int col, int playerOrBot){
-        int type = 0;
-        if(playerOrBot == 1){
-            playerBoard.shootInOtherBoard(botBoard,row,col);
-            System.out.println(botBoard.showBoard(botBoard.getBoard()));
-            type = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
-        }else{
-            type = playerBoard.getNumberByIndex(playerBoard.getBoard(),row,col);
-            System.out.println("row: "+row+" col: "+col);
-            System.out.println("type: " + type);
+        boolean isDestroyed;
+        int type;
+        try{
+            if(playerOrBot == 1){
+                System.out.println("Realiza el tiro player---------------------------------------------------------------");
+                playerBoard.shootInOtherBoard(botBoard,row,col);
+                System.out.println(botBoard.showBoard(botBoard.getBoard()));
+                type = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
+            }else{
+                type = playerBoard.getNumberByIndex(playerBoard.getBoard(),row,col);
+                System.out.println("row: "+row+" col: "+col);
+                System.out.println("type: " + type);
+            }
+
+
+
+
+
+            System.out.println("Shoot on boat type, "+type );
+
+            StackPane shotPane = new StackPane();
+            if (type == -6) {
+                FailShot failShot = new FailShot();
+                Group ShotGroup = failShot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
+            }
+            else{
+                Bomb Shot = new Bomb();
+                Group ShotGroup = Shot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
+            }
+            if (playerOrBot==1){
+//                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
+//                System.out.println(row +col);
+//
+//                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
+//                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
+                if(type !=(-6)){
+
+//                    System.out.println("Hasta aqui llega");
+                    isDestroyed = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
+//                    System.out.println("paso is destroted" + isDestroyed);
+//                    System.out.println("shot in row "+row+" col "+col);
+//                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
+//                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
+                    if(isDestroyed){
+                        playerBoard.boatSunk();
+                        playerBoard.isWinnner();
+                        System.out.println("DESTRUIDOOOOOOOO");
+                        makeBoatDestroyed(row, col,2);
+                        System.out.println("DESTRUIDOOOOOOOO");
+                    }else{
+                        botGridPane.add(shotPane, col, row);
+                    }
+
+                }else{
+                    botGridPane.add(shotPane, col, row);
+                }
+
+            }else{
+                if(type!=(-6)){
+                    System.out.println("Hasta aqui llega");
+
+                    isDestroyed = playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
+
+                    System.out.println("paso is destroted" + isDestroyed);
+                    System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
+
+                    if(isDestroyed){
+                        botBoard.boatSunk();
+                        botBoard.isWinnner();
+                        makeBoatDestroyed(row, col,1);
+
+                    }else{
+                        playerGridPane.add(shotPane, col, row);
+                    }
+
+                }else{
+                    playerGridPane.add(shotPane, col, row);
+                }
+
+            }
+
+        }catch(Exception e){
+            System.out.println("Some error has ocurred.");
+        }
+    }
+
+    public void makeBoatDestroyed(int row, int col, int playerOrBot){
+
+        try{
+            int boatType;
+            List<List<Integer>> boatUbication;
+            if (playerOrBot == 1){
+                boatType = playerBoard.getNumberByIndex(playerBoard.getBoard(),row,col);
+                boatUbication = playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),row,col).getBoatUbication();
+
+            }else{
+                boatType = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
+                System.out.println("si coge type: "+boatType);
+                System.out.println("fila: "+row+" columna: "+col);
+                boatUbication = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).getBoatUbication();
+            }
+            int endIndex = switch (boatType) {
+                case -1 -> 1;
+                case -2 -> 2;
+                case -3 -> 3;
+                case -4 -> 4;
+                default -> 0;
+            };
+
+            for(int i=0; i<endIndex; i++){
+                for (List<Integer> row2 : boatUbication) {
+                    int fila = row2.get(0);
+                    int column = row2.get(1);
+                    StackPane shotroot = new StackPane();
+                    Fire shot = new Fire();
+                    Group shotRoot = shot.getRoot();
+                    shotRoot.setScaleX(0.25);
+                    shotRoot.setScaleY(0.25);
+                    shotroot.setTranslateX(-35);
+                    shotroot.setTranslateY(0);
+                    shotroot.getChildren().add(shotRoot);
+                    shotroot.setPrefSize(35, 35); // Tamaño preferido
+                    shotroot.setMinSize(35, 35);  // Tamaño mínimo
+                    shotroot.setMaxSize(35, 35);
+                    shotroot.setTranslateX(0);
+
+
+                    if(playerOrBot==1){
+                        playerGridPane.add(shotroot, column, fila);
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
+                    }else{
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
+                        botGridPane.add(shotroot, column, fila);
+                    }
+                }
+            }
+
+
+        }catch(GameException.OutOfBoardAction e){
+            System.out.println(e.getMessage());
+            System.out.println("yep");
         }
 
-        Circle shot = new Circle();
-        shot.setRadius(10);
-        shot.setTranslateX(7.5);
-        switch (type) {
-            case -6:
-                shot.setFill(Color.CHOCOLATE);
-                break;
-            case -1:
-                shot.setFill(Color.GREEN);
-                break;
-            case -2:
-                shot.setFill(Color.PURPLE);
-                break;
-            case -3:
-                shot.setFill(Color.DARKRED);
-                break;
-            case -4:
-                shot.setFill(Color.ROYALBLUE);
-                break;
-        }
-        if (playerOrBot==1){
-            botGridPane.add(shot, col, row);
-            System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
-        }else{
-            playerGridPane.add(shot, col, row);
-            System.out.println("player board: "+ playerBoard.showBoard(botBoard.getBoard()));
-        }
     }
 
     @FXML
@@ -718,8 +895,34 @@ public class GameController {
             }
         }
     }
+
+
+//    public void makeDraggable(Node node) {
+//        // Variables para almacenar las coordenadas iniciales del nodo
+//        final double[] initialTranslateX = {0};
+//        final double[] initialTranslateY = {0};
+//
+//        // Evento para registrar las coordenadas iniciales
+//        node.setOnMousePressed(mouseEvent -> {
+//            mouseAnchorX = mouseEvent.getSceneX();
+//            mouseAnchorY = mouseEvent.getSceneY();
+//            initialTranslateX[0] = node.getTranslateX();
+//            initialTranslateY[0] = node.getTranslateY();
+//        });
+//
+//        // Evento para actualizar la posición del nodo mientras se arrastra
+//        node.setOnMouseDragged(mouseEvent -> {
+//            double deltaX = mouseEvent.getSceneX() - mouseAnchorX;
+//            double deltaY = mouseEvent.getSceneY() - mouseAnchorY;
+//
+//            node.setTranslateX(initialTranslateX[0] + deltaX);
+//            node.setTranslateY(initialTranslateY[0] + deltaY);
+//        });
+//    }
+
     public void startPlay() {
         createBotTable();
         createPlayerTable();
     }
+
 }
