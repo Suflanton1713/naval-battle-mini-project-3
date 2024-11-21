@@ -44,7 +44,7 @@ public class GameController {
     private int rotationCounter = 0;
     private double mouseAnchorX;
     private double mouseAnchorY;
-    private boolean isWatchBotBoardOn = false;
+    private boolean isWatchBotBoardOn = true;
     private int missingPlayerShips = 10;
 
 
@@ -469,6 +469,7 @@ public class GameController {
 
              // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
              StackPane ship = getPaneOfShip(type, 2);
+             ship.setVisible(false);
              if (ship == null) return;
 
              // Obtener la dirección del barco desde el tablero del bot
