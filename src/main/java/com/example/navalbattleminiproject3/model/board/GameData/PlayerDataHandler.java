@@ -1,6 +1,7 @@
 package com.example.navalbattleminiproject3.model.board.GameData;
 
 import com.example.navalbattleminiproject3.model.board.Board.BoardAdapter;
+import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class PlayerDataHandler {
                 throw new IllegalArgumentException("Profile " + profileName + " is not created");
             }
 
-            return (Object) serializableData.deserializeData(profileName + ".player");
+            return (Object) serializableData.deserializeData(profileName + ".ply");
 
         } catch (IllegalArgumentException e1){
             System.out.println("An error has been ocurred. " + e1.getMessage());
@@ -83,7 +84,9 @@ public class PlayerDataHandler {
                 throw new IllegalArgumentException("Profile " + profileName + " is not created");
             }
 
-            serializableData.serializeData(profileName + ".player", boardAdapter);
+
+
+            serializableData.serializeData(profileName + ".ply", boardAdapter);
 
             return true;
 
@@ -91,6 +94,56 @@ public class PlayerDataHandler {
             System.out.println("Oh it seems like we will have to do it again. " + e1.getMessage());
             createProfile(profileName);
             return saveBoardProfile(profileName, boardAdapter);
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            System.out.println("A big error has been ocurred.");
+        }
+        return false;
+    }
+
+    public Object[] loadMatch(String profileName) {
+        Object[] returnBoards = new Object[2];
+        try {
+
+            if(!(isProfileCreated(profileName))) {
+                throw new IllegalArgumentException("Profile " + profileName + " is not created");
+            }
+
+            returnBoards[0] = (PlayerBoard) serializableData.deserializeData(profileName + ".ply");
+            returnBoards[1] = (BotBoard) serializableData.deserializeData(profileName + ".bot");
+
+            return returnBoards;
+
+        } catch (IllegalArgumentException e1){
+            System.out.println("An error has been ocurred. " + e1.getMessage());
+            createProfile(profileName);
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean saveMatch(String profileName, PlayerBoard playerBoard, BotBoard botBoard, int profilePoints) {
+        try{
+
+            if(!(isProfileCreated(profileName))) {
+                throw new IllegalArgumentException("Profile " + profileName + " is not created");
+            }
+
+            updateProfile(profileName, profilePoints);
+
+            serializableData.serializeData(profileName + ".ply", playerBoard);
+            serializableData.serializeData(profileName + ".bot", botBoard);
+
+            return true;
+
+        } catch (IllegalArgumentException e1){
+            System.out.println("Oh it seems like we will have to do it again. " + e1.getMessage());
+            createProfile(profileName, profilePoints);
+            return saveMatch(profileName, playerBoard, botBoard, profilePoints);
 
         } catch (Exception e2) {
             e2.printStackTrace();
@@ -109,6 +162,24 @@ public class PlayerDataHandler {
             pointsData.add("0");
 
         }catch(IllegalArgumentException e) {
+            createProfile(profileName + "New");
+            System.out.println("An error has been ocurred. " + e.getMessage());
+        }
+
+
+    }
+
+    public void createProfile(String profileName, int profilePoints) {
+        try {
+            if(nicknamesData.contains(profileName)) {
+                throw new IllegalArgumentException("Profile already exists");
+            }
+            plainData.writeToFile("data_panda.csv", profileName + "," + 0);
+            nicknamesData.add(profileName);
+            pointsData.add(String.valueOf(profilePoints));
+
+        }catch(IllegalArgumentException e) {
+            createProfile(profileName + "New", profilePoints);
             System.out.println("An error has been ocurred. " + e.getMessage());
         }
 

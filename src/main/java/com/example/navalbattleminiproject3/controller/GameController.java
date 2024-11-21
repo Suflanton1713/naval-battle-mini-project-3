@@ -1,16 +1,24 @@
 package com.example.navalbattleminiproject3.controller;
 
+import com.example.navalbattleminiproject3.model.board.Board.BoardAdapter;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
+import com.example.navalbattleminiproject3.model.board.GameData.PlayerDataHandler;
+import com.example.navalbattleminiproject3.model.board.GameData.SerializableGameData;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
 import com.example.navalbattleminiproject3.view.GameView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -21,11 +29,13 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
+    private PlayerDataHandler playerDataHandler;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
     private List<Pane> playerPaneShips = new ArrayList<>(10);
@@ -72,17 +82,12 @@ public class GameController {
 
 
     @FXML
-    public void initialize() {
-        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
-        playerBoard = new PlayerBoard();
-        botBoard = new BotBoard();
-        createBoardShips();
-        for (int i = 1; i < 5; i++) {
-            organizePlayerShipsInVBox(i);
-        }
-        System.out.println("botShips: "+ showArrayBotShips());
+    public void initialize(boolean isLoadedMatch, String loadedProfile) {
+        startPlay(isLoadedMatch, loadedProfile);
+    }
 
-
+    public boolean loadMatch(BotBoard playerBoard, PlayerBoard botBoard){
+        return false;
     }
 
     public void organizePlayerShipsInVBox(int type) {
@@ -160,7 +165,7 @@ public class GameController {
         root.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-style: solid;");
 
         for (int i = 0; i < type; i++) {
-            Rectangle rect = new Rectangle(35, 35);
+            Rectangle rect = new Rectangle(20, 20);
             rect.setFill(Color.PINK);
             rect.setStroke(Color.RED);
 
@@ -206,6 +211,9 @@ public class GameController {
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
                             if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
+                                ship.setBackground(new Background(
+                                        new BackgroundFill(Color.rgb(0, 0, 0, 0), CornerRadii.EMPTY, null)
+                                ));
                                 placeBoatInCell(ship, row, col, playerGridPane);
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
@@ -297,27 +305,51 @@ public class GameController {
             }
         }
 
+    }
+
+
+    public void loadPlayerTable(){
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Rectangle rect = new Rectangle(35, 35);
+                rect.setFill(Color.LIGHTBLUE);
+                rect.setStroke(Color.BLACK);
+                botGridPane.add(rect, j, i);
+            }
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                int shipType = playerBoard.getNumberByIndex(playerBoard.getBoard(), i, j);
+                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
+                    if(!(usedBotBoats.contains(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j)))){
+                        positionBotShipWithDirection(shipType,i,j);
+                        usedBotBoats.add(botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),i,j));
+                    }
+                }
+            }
+        }
 
     }
      public void positionBotShipWithDirection(int type, int row, int col){
         Pane ship = getPaneOfShip(type,2);
         int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
-         System.out.println("tipo de barco que se agarró: "+type+" direccion: "+boardDirection
-         + " fila: "+row+" column: "+col);
+
         if (boardDirection==0|| boardDirection==2){
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
+
+
             placeBoatInCell(ship,row,col,botGridPane);
             usedBotPaneShip.add(ship);
             botPaneShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
 
         }else{
+
             rotateBoat(ship, 2);
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
             usedBotPaneShip.add(ship);
             botPaneShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
+
         }
      }
 
@@ -405,6 +437,7 @@ public class GameController {
             default -> 0;
         };
 
+
         for (int i = 0; i <= num; i++) {
             int directionCol = col, DirectionRow = row;
             switch (direction) {
@@ -437,6 +470,7 @@ public class GameController {
     }
 
     public void handleMouseExit(Rectangle rect, int row, int col) {
+        clearHoverEffect();
         for (Pane ship : playerPaneShips) {
             if (ship != null && ship.isFocused()) {
                 int shipType = getPlayerShipType(ship);
@@ -460,44 +494,74 @@ public class GameController {
 
     }
     public void changeTurnToBot(){
-        System.out.println("Botes destruídos por jugador" + playerBoard.getActualGameBoatsSunk());
-        System.out.println("El jugador gano" + playerBoard.isWinnner());
-
-        System.out.println("Botes destruídos por bot" + botBoard.getActualGameBoatsSunk());
-        System.out.println("El jugador gano" + botBoard.isWinnner());
-
-        if(!botBoard.isWinnner()){
-            disableBotBoard(false);
-        }else{
-            System.out.println("El bot gano");
-            disableBotBoard(true);
-            disablePlayerBoard(true);
-        }
 
         disablePlayerBoard(false);
         for (Pane ship : usedPlayerPanes) {
             ship.setMouseTransparent(true);
         }
-        int[] destroyedPart;
-        destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
-        int row = destroyedPart[0];
-        int col = destroyedPart[1];
-        System.out.println("row: "+row+" col: "+col);
-        System.out.println("despues de shot: ");
-        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-        makeShot(row,col, 2);
 
-        System.out.println("Botes destruídos por jugador" + botBoard.getActualGameBoatsSunk());
-        System.out.println("El bot gano" + botBoard.isWinnner());
+        System.out.println("Botes destruídos por jugador " + playerBoard.getActualGameBoatsSunk() + " y siempre " +playerBoard.getBoatsSunkEver());
+        System.out.println("El jugador gano" + playerBoard.isWinnner());
+
+        System.out.println("Botes destruídos por bot" + botBoard.getActualGameBoatsSunk());
+        System.out.println("El jugador gano" + botBoard.isWinnner());
 
         if(!playerBoard.isWinnner()){
             disablePlayerBoard(false);
-        }else{
+            disableBotBoard(true);
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.5)); // 2 segundos de pausa
+            pause.setOnFinished(event -> {
+                int[] destroyedPart;
+                destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
+                int row = destroyedPart[0];
+                int col = destroyedPart[1];
+                System.out.println("row: " + row + " col: " + col);
+                System.out.println("Después del disparo: ");
+                System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+                makeShot(row, col, 2);
+                System.out.println("Tablero del jugador\n" + playerBoard.showBoard(playerBoard.getBoard()));
+
+                System.out.println("Botes destruidos por jugador: " + botBoard.getActualGameBoatsSunk());
+                System.out.println("El bot ganó: " + botBoard.isWinnner());
+
+                // Verificar si el juego terminó
+                if (!botBoard.isWinnner()) {
+                    disableBotBoard(false);
+                    setDisableShotCells();
+                } else {
+                    System.out.println("El bot ganó");
+                    disableBotBoard(true);
+                    disablePlayerBoard(true);
+                    win(2);
+                    System.out.println("Juego terminado");
+                }
+
+
+            });
+
+            pause.play();
+
+        }else {
             System.out.println("El jugador gano");
             disableBotBoard(true);
             disablePlayerBoard(true);
+            win(1);
+            System.out.println("yepissss");
         }
+    }
 
+    public void setDisableShotCells(){
+        int num;
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+                num=botBoard.getNumberByIndex(botBoard.getBoard(),i,j);
+                if(num==-6||num==-1||num==-2||num==-3||num==-4){
+                    Node node = getNodeFromGridPane(botGridPane, j, i);
+                    node.setDisable(true);
+                }
+            }
+        }
     }
 
     public void prepareBotBoardForShot(){
@@ -515,7 +579,6 @@ public class GameController {
                         makeShot(col,row, 1);
                         disableBotBoard(true);
                         changeTurnToBot();
-
                     });
                 }
 
@@ -526,7 +589,7 @@ public class GameController {
     public void disableBotBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(botGridPane, i, j);
+                Node node = getNodeFromGridPane(botGridPane, j, i);
                 node.setDisable(disable);
             }
         }
@@ -534,7 +597,7 @@ public class GameController {
     public void disablePlayerBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                Node node = getNodeFromGridPane(playerGridPane, i, j);
+                Node node = getNodeFromGridPane(playerGridPane, j, i);
                 node.setDisable(disable);
             }
         }
@@ -542,9 +605,8 @@ public class GameController {
 
     public void makeShot(int row, int col, int playerOrBot){
         boolean isDestroyed;
-        int type = 0;
+        int type;
         try{
-
             if(playerOrBot == 1){
                 System.out.println("Realiza el tiro player---------------------------------------------------------------");
                 playerBoard.shootInOtherBoard(botBoard,row,col);
@@ -578,23 +640,19 @@ public class GameController {
                     break;
             }
             if (playerOrBot==1){
-                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
-                System.out.println(row +col);
-
-                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
-                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
+//                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
+//                System.out.println(row +col);
+//
+//                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
+//                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
                 if(type !=(-6)){
 
-                    System.out.println("Hasta aqui llega");
-
-
+//                    System.out.println("Hasta aqui llega");
                     isDestroyed = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
-
-                    System.out.println("paso is destroted" + isDestroyed);
-
-                    System.out.println("shot in row "+row+" col "+col);
-                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
-                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
+//                    System.out.println("paso is destroted" + isDestroyed);
+//                    System.out.println("shot in row "+row+" col "+col);
+//                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
+//                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
                         playerBoard.boatSunk();
                         playerBoard.isWinnner();
@@ -606,37 +664,29 @@ public class GameController {
                     }
 
                 }else{
-
                     botGridPane.add(shot, col, row);
-
                 }
 
             }else{
-                if(type!=-6){
+                if(type!=(-6)){
                     System.out.println("Hasta aqui llega");
 
                     isDestroyed = playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
 
                     System.out.println("paso is destroted" + isDestroyed);
-
-
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
                         botBoard.boatSunk();
                         botBoard.isWinnner();
-                        makeBoatDestroyed(row, col,2);
+                        makeBoatDestroyed(row, col,1);
 
                     }else{
-
                         playerGridPane.add(shot, col, row);
-
                     }
 
                 }else{
-
                     playerGridPane.add(shot, col, row);
-
                 }
 
             }
@@ -658,17 +708,17 @@ public class GameController {
 
             }else{
                 boatType = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
-
+                System.out.println("si coge type: "+boatType);
+                System.out.println("fila: "+row+" columna: "+col);
                 boatUbication = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).getBoatUbication();
             }
             int endIndex = switch (boatType) {
                 case -1 -> 1;
-                case -2 -> 3;
-                case -3 -> 4;
-                case -4 -> 5;
+                case -2 -> 2;
+                case -3 -> 3;
+                case -4 -> 4;
                 default -> 0;
             };
-
 
             for(int i=0; i<endIndex; i++){
                 for (List<Integer> row2 : boatUbication) {
@@ -680,7 +730,9 @@ public class GameController {
                     shot.setFill(Color.YELLOW);
                     if(playerOrBot==1){
                         playerGridPane.add(shot, column, fila);
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
                     }else{
+                        System.out.println("yellow shot in: fila "+fila+" columna "+column);
                         botGridPane.add(shot, column, fila);
                     }
                 }
@@ -689,6 +741,7 @@ public class GameController {
 
         }catch(GameException.OutOfBoardAction e){
             System.out.println(e.getMessage());
+            System.out.println("yep");
         }
 
     }
@@ -705,6 +758,8 @@ public class GameController {
             }
         }
     }
+
+
 
 
 //    public void makeDraggable(Node node) {
@@ -729,10 +784,154 @@ public class GameController {
 //            node.setTranslateY(initialTranslateY[0] + deltaY);
 //        });
 //    }
+public void win(int playerOrBot) {
+    playerBoard.restartGame();
+    botBoard.restartGame();
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("YOU WON! CONGRATULATIONS!");
+    alert.setHeaderText(null);
+    alert.setGraphic(null);
+    alert.setContentText(null);
+    DialogPane dialogPane = alert.getDialogPane();
+    ButtonType okButtonType = ButtonType.OK;
+    Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
+    Label resultsLabel = new Label();
+    if (playerOrBot == 1) {
+        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos" + playerBoard.getBoatsSunkEver());
+    } else {
+        resultsLabel.setText("Felicidades Robii" + "Puntos " + botBoard.getActualGameBoatsSunk());
+    }
+    okButton.setStyle(
+            "-fx-background-color: purple; " +
+                    "-fx-text-fill: white; " +
+                    "-fx-font-size: 25px;"
+    );
+    resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+            "-fx-text-fill: black; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 32px;");
 
-    public void startPlay() {
-        createBotTable();
-        createPlayerTable();
+    VBox content = new VBox();
+    content.getChildren().add(resultsLabel);
+    content.setStyle("-fx-alignment: center;");
+    VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
+
+    content.setAlignment(Pos.BOTTOM_CENTER);
+    alert.getDialogPane().setContent(content);
+    dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
+    dialogPane.getStyleClass().add("mi-alerta");
+    alert.show();
+
+//        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+//            AddPetal(dialogPane);
+//        }));
+//
+//        timeline.setCycleCount(10);
+//        timeline.play();
+
+    playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+
+
+
+}
+
+public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
+        for (List<Integer> row : board) {
+            System.out.println(row);
+            for(int i=0; i<row.size(); i++){
+                System.out.println("indice del for "+i);
+                System.out.println("tamaño de la row" + row.size());
+                System.out.println("Objeto que accedo" + row.get(i));
+                if(row.get(i)==(-6)) {
+                    row.set(i, 0);
+                }
+                if(row.get(i)<0){
+                    row.set(i, row.get(i)*(-1));
+                }
+
+                System.out.println("Después de limpio" + row.get(i));
+            }
+        }
+    System.out.println("Se limpió tablero");
+    System.out.println(board);
+        return board;
+
+}
+
+    public void loadShootsOnBoard(int playerOrBot, List<List<Integer>> shootedReferenceboard) {
+        for (int i = 0; i < shootedReferenceboard.size(); i++) {
+            for (int j = 0; j < shootedReferenceboard.get(i).size(); j++) {
+                System.out.println("Número en " +i+j + " :" +shootedReferenceboard.get(i).get(j));
+
+                if (shootedReferenceboard.get(i).get(j) < 0) {
+                    makeShot(i,j,playerOrBot);
+                }
+
+            }
+        }
+    }
+
+
+
+
+    public void startPlay(boolean isLoadedMatch, String loadedProfile){
+        playerDataHandler = new PlayerDataHandler();
+        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+        if(isLoadedMatch){
+            Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
+
+            playerBoard = (PlayerBoard) returnBoard[0];
+            botBoard =  (BotBoard) returnBoard[1];
+
+            List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
+            List<List<Integer>> temporalBotBoard = new ArrayList<>();
+
+            for (List<Integer> innerList : playerBoard.getBoard()) {
+                List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+                temporalPlayerBoard.add(newInnerList);
+            }
+
+            for (List<Integer> innerList : botBoard.getBoard()) {
+                List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+                temporalBotBoard.add(newInnerList);
+            }
+
+            playerBoard.setBoard(cleanLoadedBoards(playerBoard.getBoard()));
+            botBoard.setBoard(cleanLoadedBoards(botBoard.getBoard()));
+
+
+            System.out.println("Tableros temporales");
+
+            System.out.println(temporalPlayerBoard);
+            System.out.println(temporalBotBoard);
+
+            System.out.println("Tableros recogidos de los temporales");
+            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+            System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+            createBoardShips();
+            for (int i = 1; i < 5; i++) {
+                organizePlayerShipsInVBox(i);
+            }
+            System.out.println("botShips: "+ showArrayBotShips());
+            createBotTable();
+            createPlayerTable();
+
+            loadShootsOnBoard(1, temporalBotBoard);
+
+        }else{
+            playerBoard = new PlayerBoard();
+            botBoard = new BotBoard();
+            createBoardShips();
+            for (int i = 1; i < 5; i++) {
+                organizePlayerShipsInVBox(i);
+            }
+            System.out.println("botShips: "+ showArrayBotShips());
+            createBotTable();
+            createPlayerTable();
+
+        }
+
     }
 
 }

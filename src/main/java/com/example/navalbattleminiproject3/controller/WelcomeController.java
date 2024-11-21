@@ -15,7 +15,7 @@ public class WelcomeController {
     @FXML
     void handleClickPlay(ActionEvent event) {
         WelcomeView.deleteInstance();
-        GameView.getInstance().getGameController().startPlay();
+        GameView.getInstance().getGameController().initialize(true, "Player");
 
     }
 
