@@ -6,10 +6,25 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * This class creates a graphical representation of a "wing" (Ala) using JavaFX shapes.
+ * It is part of the game's view and creates various shapes like ellipses, rectangles, and polygons
+ * to represent a visual element of the game.
+ * @author Maria Juliana Saavedra, Libardo Alejandro Quintero, Juan David Rincon Lopez
+ * @version 1.0
+ */
 public class AlaView extends Group {
     private Group root;
+
+    /**
+     * Constructor that initializes the graphical elements of the "Ala" view.
+     * This constructor creates various shapes (ellipses, rectangles, and polygons)
+     * and adds them to the root Group.
+     * @version 1.0
+     */
     public AlaView() {
         root = new Group();
+
         // Ellipse
         Ellipse ellipse = new Ellipse(186.0, 89.0, 136.0, 22.0);
         ellipse.setFill(Color.valueOf("#dfdfdf"));
@@ -57,7 +72,16 @@ public class AlaView extends Group {
         );
     }
 
-    // Helper method to create rectangles
+    /**
+     * Helper method to create rectangles with rounded corners.
+     * @param x the x-coordinate of the rectangle's position.
+     * @param y the y-coordinate of the rectangle's position.
+     * @param width the width of the rectangle.
+     * @param height the height of the rectangle.
+     * @param fillColor the color to fill the rectangle.
+     * @return the created rectangle.
+     * @version 1.0
+     */
     private Rectangle createRectangle(double x, double y, double width, double height, String fillColor) {
         Rectangle rect = new Rectangle(x, y, width, height);
         rect.setFill(Color.valueOf(fillColor));
@@ -67,13 +91,24 @@ public class AlaView extends Group {
         return rect;
     }
 
-    // Helper method to create polygons
+    /**
+     * Helper method to create polygons.
+     * @param points the points of the polygon.
+     * @return the created polygon.
+     * @version 1.0
+     */
     private Polygon createPolygon(double... points) {
         Polygon polygon = new Polygon(points);
         polygon.setFill(Color.valueOf("#dfdfdf"));
         polygon.setStroke(Color.BLACK);
         return polygon;
     }
+
+    /**
+     * Gets the root Group containing all graphical elements of the "Ala" view.
+     * @return the root Group containing all shapes.
+     * @version 1.0
+     */
     public Group getRoot() {
         return root;
     }

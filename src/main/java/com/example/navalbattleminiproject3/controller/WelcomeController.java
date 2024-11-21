@@ -5,7 +5,6 @@ import com.example.navalbattleminiproject3.view.GameView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,7 +17,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.util.Objects;
-
+/**
+ * Controller class for the Welcome view.
+ * Manages user interactions and initializes game settings.
+ * @author Maria Juliana Saavedra, Libardo Alejandro Quintero, Juan David Rincon Lopez
+ * @version 1.0
+ */
 public class WelcomeController {
     @FXML
     private ImageView imageHologram;
@@ -52,13 +56,25 @@ public class WelcomeController {
             new Image(getClass().getResourceAsStream("/com/example/navalbattleminiproject3/images/characters/vader.png"))
     };
 
-
-
+    /**
+     * Handles the exit button click event.
+     * Closes the Welcome view and releases its resources.
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see WelcomeView#deleteInstance()
+     * @version 1.0
+     */
     @FXML
     void handleClickExit(ActionEvent event) {
         WelcomeView.deleteInstance();
     }
-
+    /**
+     * Handles the play button click event to start a new game.
+     * Passes the selected character and initializes the game.
+     * @see GameView#getInstance()
+     * @see GameView#setPlayerCharacter(Image)
+     * @see GameView#setBotCharacter(Image[])
+     * @version 1.0
+     */
     @FXML
     void handleClickPlay() {
         WelcomeView.deleteInstance();
@@ -75,8 +91,14 @@ public class WelcomeController {
         // Iniciar el juego
         gameView.getGameController().initialize(true, newNameProfile);
     }
-
-    public void continuePlay(){
+    /**
+     * Continues a previously saved game.
+     * Passes the selected character and loads the saved player profile.
+     * @see GameView#getInstance()
+     * @see GameView#setPlayerCharacter(Image)
+     * @version 1.0
+     */
+    public void continuePlay() {
         WelcomeView.deleteInstance();
 
         // Obtener la instancia de GameView
@@ -91,15 +113,25 @@ public class WelcomeController {
         // Iniciar el juego
         gameView.getGameController().initialize(true, loadNameProfile);
     }
-
+    /**
+     * Handles the event when a new nickname is accepted.
+     * Updates the profile name with the text entered by the user.
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see #newNameProfile
+     * @version 1.0
+     */
     @FXML
     void handleAceptNickname(ActionEvent event) {
-        // When the button is clicked, get the text from the TextField and print it
         String text = txtProfileNewName.getText();
         newNameProfile = text;
-        System.out.println(newNameProfile);
     }
-
+    /**
+     * Handles the continue button click event.
+     * Displays saved profiles and allows the user to load one or start with default settings.
+     * @see PlayerDataHandler#getNicknamesData()
+     * @see #continuePlay()
+     * @version 1.0
+     */
     @FXML
     void handleClickContinue() {
         Stage instructionStage = new Stage();
@@ -149,13 +181,13 @@ public class WelcomeController {
             loadNameProfile = texto;
             PlayerDataHandler playerDataHandler = new PlayerDataHandler();
 
-            if ((!(Objects.equals(loadNameProfile, "")) && (playerDataHandler.getNicknamesData().contains(loadNameProfile))) || loadingCounter>=1){
-                if(loadingCounter>=1){
+            if ((!(Objects.equals(loadNameProfile, "")) && (playerDataHandler.getNicknamesData().contains(loadNameProfile))) || loadingCounter >= 1) {
+                if (loadingCounter >= 1) {
                     loadNameProfile = "Player";
                 }
                 continuePlay();
                 instructionStage.close();
-            }else{
+            } else {
                 loadingCounter++;
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Ingresa un usuario valido!");
@@ -215,7 +247,14 @@ public class WelcomeController {
         // Show the instruction stage
         instructionStage.showAndWait();
     }
-
+    /**
+     * Handles the credits button click event.
+     * Displays credits information in a new modal window.
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see Stage
+     * @see VBox
+     * @version 1.0
+     */
     @FXML
     void handleClickCredits(ActionEvent event) {
         Stage creditsStage = new Stage();
@@ -273,7 +312,14 @@ public class WelcomeController {
         // Show the instruction stage
         creditsStage.showAndWait();
     }
-
+    /**
+     * Displays the game instructions in a modal window.
+     * Provides a step-by-step guide to playing the game, accompanied by illustrative images.
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see Stage
+     * @see VBox
+     * @version 1.0
+     */
     @FXML
     void handleClickInstruction(ActionEvent event) {
         Stage instructionStage = new Stage();
@@ -415,13 +461,28 @@ public class WelcomeController {
 
 
 
-
+    /**
+     * Initializes the Welcome view with the default character and hologram images.
+     * Sets the initial state of the UI elements.
+     * @see #characterImages
+     * @see #hologramImages
+     * @version 1.0
+     */
     @FXML
     void initialize() {
         imageCharacter.setImage(characterImages[currentImageIndex]);
         imageHologram.setImage(hologramImages[currentImageIndex]);
     }
-
+    /**
+     * Handles the event of selecting a new character.
+     * Cycles through the available character and hologram images, updating the displayed selection.
+     * Saves the currently selected character for further use.
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see #selectedCharacter
+     * @see #characterImages
+     * @see #hologramImages
+     * @version 1.0
+     */
     @FXML
     void handleSelectCharacter(ActionEvent event) {
         currentImageIndex = (currentImageIndex + 1) % characterImages.length;
@@ -431,7 +492,11 @@ public class WelcomeController {
         // Guardar la selección actual
         selectedCharacter = characterImages[currentImageIndex];
     }
-
+    /**
+     * Retrieves the character image currently selected by the user.
+     * @return the {@code Image} representing the selected character.
+     * @version 1.0
+     */
     public Image getSelectedCharacter() {
         return selectedCharacter;
     }

@@ -2,23 +2,28 @@ package com.example.navalbattleminiproject3.model.board.Board;
 
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
-import jdk.swing.interop.SwingInterOpUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+/**
+ * Represents the bot's game board, extending {@code BoardAdapter}.
+ * Provides methods for boat spawning, shooting at the player's board, and managing game state.
+ * @author Maria Juliana Saavedra, Libardo Alejandro Quintero, Juan David Rincon Lopez
+ * @version 1.0
+ */
 public class BotBoard extends BoardAdapter {
 
     List<List<Integer>> board;
-
     List<List<Boats>> boardWithBoats;
-
     List<Integer> allBoatsUsed;
-
     int actualGameBoatsSunk;
-
     boolean winner;
 
+    /**
+     * Constructor initializes the bot's board and randomly places the boats.
+     * Also sets up the list of boats and their initial positions.
+     * @version 1.0
+     */
     public BotBoard() {
         board = new ArrayList<>(10);
         boardWithBoats = new ArrayList<>(10);
@@ -37,53 +42,78 @@ public class BotBoard extends BoardAdapter {
         Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
 
         for(int i = 9 ; i>=0 ; i--){
-
             String[] boatPosition = randomBoatGeneration(allBoatsUsed.get(i));
-
-            Boats actualBoat = new Boats(allBoatsUsed.get(i),getDirectionByPosition(boatPosition), boatPosition);
-            System.out.println("Left boat generation");
+            Boats actualBoat = new Boats(allBoatsUsed.get(i), getDirectionByPosition(boatPosition), boatPosition);
             for (String position : boatPosition ) {
-                System.out.println("Boat position" + position);
                 setNumberByIndex(board, allBoatsUsed.get(i), Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
-                System.out.println("HI");
                 setObjectByIndex(boardWithBoats, actualBoat, Integer.parseInt("" + position.charAt(0)), Integer.parseInt("" + position.charAt(1)));
-                System.out.println(showBoard(board));
             }
-            allBoatsUsed.set(i,0);
-
+            allBoatsUsed.set(i, 0);
         }
-
-        System.out.println("Los botes usados son " + allBoatsUsed);
-
     }
 
+    /**
+     * Retrieves the bot's board with boats.
+     * @return a list of lists representing the bot's board with boats.
+     * @version 1.0
+     */
     public List<List<Boats>> getBoardWithBoats() {
         return boardWithBoats;
     }
 
+    /**
+     * Sets the number of boats sunk in the current game.
+     * @param actualGameBoatsSunk the number of boats sunk.
+     * @version 1.0
+     */
     public void setActualGameBoatsSunk(int actualGameBoatsSunk) {
         this.actualGameBoatsSunk = actualGameBoatsSunk;
     }
 
+    /**
+     * Gets the current number of boats sunk in the game.
+     * @return the number of boats sunk.
+     * @version 1.0
+     */
     public int getActualGameBoatsSunk() {
         return actualGameBoatsSunk;
     }
 
+    /**
+     * Sets the bot's board with boats.
+     * @param boardWithBoats a list of lists representing the board with boats.
+     * @version 1.0
+     */
     public void setBoardWithBoats(List<List<Boats>> boardWithBoats) {
         this.boardWithBoats = boardWithBoats;
     }
 
+    /**
+     * Retrieves the bot's board as a grid of integers representing the board's state.
+     * @return a list of lists representing the bot's board.
+     * @version 1.0
+     */
     public List<List<Integer>> getBoard() {
-
         return board;
     }
 
+    /**
+     * Sets the bot's board state with the specified grid.
+     * @param board a list of lists representing the board's new state.
+     * @version 1.0
+     */
     public void setBoard(List<List<Integer>> board) {
         this.board = board;
     }
 
+    /**
+     * Generates a random boat position on the bot's board.
+     * Attempts to place the boat in an empty space with the specified length and direction.
+     * @param boatNumber the length of the boat.
+     * @return an array of strings representing the positions of the boat on the grid.
+     * @version 1.0
+     */
     public String[] randomBoatGeneration(int boatNumber) {
-        System.out.println("Generating " + boatNumber+ " boat type");
         Random random = new Random();
         String[] boatPositions = new String[boatNumber];
         int randomCol;
@@ -95,31 +125,22 @@ public class BotBoard extends BoardAdapter {
         randomRow = random.nextInt(board.toArray().length);
         randomDirection = random.nextInt(4);
 
-
         //randomBoatNumber also represents the boat length
         do{
             positionTryCounter++;
-            System.out.println(positionTryCounter + " try direction");
             if(positionTryCounter == 4){
-                System.out.println("All tries of direction have been done");
                 positionTryCounter = 0;
                 randomCol++;
-                System.out.println("Adding 1 to column "+ randomCol);
                 if((randomCol == (board.toArray().length))) {
                     randomCol = 0;
                     randomRow++;
-                    System.out.println("Column is overIndex adding 1 to row and resetting column" + randomRow);
                     if((randomRow == (board.toArray().length))) {
                         randomRow = 0;
-                        System.out.println("Row is overIndex resetting row" + randomRow + randomCol);
                     }
                 }
 
             }
-
-            System.out.println("Creating boat: Initial row"+ randomRow + " initial col "+ randomCol + " Direction " +randomDirection);
-            if(allowedBoatPositionByNumber(board,randomRow, randomCol, randomDirection, boatNumber)) {
-
+            if(allowedBoatPositionByNumber(board, randomRow, randomCol, randomDirection, boatNumber)) {
                 for (int i = 0; i < boatNumber; i++) {
                     boatPositions[i] = String.valueOf(randomRow) + String.valueOf(randomCol);
                     switch (randomDirection) {
@@ -135,29 +156,29 @@ public class BotBoard extends BoardAdapter {
                         case 3:
                             randomRow = randomRow + 1;
                             break;
-                        default:
-                            System.out.println("Wrong direction");
-
                     }
 
                     needPositionRestart = false;
                 }
-                System.out.println(Arrays.toString(boatPositions));
-            }else{
+            } else {
                 needPositionRestart = true;
             }
-
             randomDirection++;
-            if(randomDirection==4){
-                randomDirection=0;
+            if(randomDirection == 4){
+                randomDirection = 0;
             }
+        } while(needPositionRestart);
 
-            }while(needPositionRestart);
-        System.out.println("I almost left");
-            return boatPositions;
-        }
+        return boatPositions;
+    }
 
-    public int[] randomShootInOtherBoard(BoardAdapter attackedBoard){
+    /**
+     * Performs a random shoot on the attacked board.
+     * @param attackedBoard the {@code BoardAdapter} representing the board being attacked.
+     * @return an array of integers representing the row and column where the shot occurred.
+     * @version 1.0
+     */
+    public int[] randomShootInOtherBoard(BoardAdapter attackedBoard) {
         Random random = new Random();
         int randomCol = 0;
         int randomRow = 0;
@@ -166,20 +187,19 @@ public class BotBoard extends BoardAdapter {
         boolean isBoatDestroyed = false;
         boolean allowedPosition = true;
         int[] destroyedPart = new int[2];
-        do{
-            try{
-            randomCol = random.nextInt(attackedBoard.getBoard().toArray().length);
-            randomRow = random.nextInt(attackedBoard.getBoard().toArray().length);
-
+        do {
+            try {
+                randomCol = random.nextInt(attackedBoard.getBoard().toArray().length);
+                randomRow = random.nextInt(attackedBoard.getBoard().toArray().length);
 
                 boxNumber = getNumberByIndex(attackedBoard.getBoard(), randomRow, randomCol);
-                if(getNumberByIndex(attackedBoard.getBoard(),randomRow,randomCol)<0){
+                if (getNumberByIndex(attackedBoard.getBoard(), randomRow, randomCol) < 0) {
                     throw new GameException.BoxAlreadyActivated("Box already shooted");
                 }
 
                 allowedPosition = true;
 
-            }catch(GameException.BoxAlreadyActivated e){
+            } catch (GameException.BoxAlreadyActivated e) {
                 System.out.println("Wrong box number" + e.getMessage());
                 allowedPosition = false;
 
@@ -187,72 +207,58 @@ public class BotBoard extends BoardAdapter {
                 throw new RuntimeException(e);
             }
 
-        }while(!allowedPosition);
+        } while (!allowedPosition);
 
-
-        //Higher than 0 coz all the negative numbers represent already shooted boxes
-        if(boxNumber > 0) {
+        if (boxNumber > 0) {
             setNumberByIndex(attackedBoard.getBoard(), ((-1) * boxNumber), randomRow, randomCol);
             modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), randomRow, randomCol);
-            System.out.println("Destruímos boat parts");
             modifiedBoatPart.destroyBoatParts(randomRow, randomCol);
             destroyedPart[0] = randomRow;
             destroyedPart[1] = randomCol;
             return destroyedPart;
-        }else{
-            System.out.println("Shoot on water");
-            setNumberByIndex(attackedBoard.getBoard(),(-6), randomRow, randomCol);
+        } else {
+            setNumberByIndex(attackedBoard.getBoard(), (-6), randomRow, randomCol);
             destroyedPart[0] = randomRow;
             destroyedPart[1] = randomCol;
             return destroyedPart;
         }
     }
 
-    public boolean isWinnner(){
-        if((actualGameBoatsSunk >= 10)){
+    /**
+     * Checks if the bot has won the game by sinking all of the player's boats.
+     * @return {@code true} if the bot has won, {@code false} otherwise.
+     * @version 1.0
+     */
+    public boolean isWinnner() {
+        if (actualGameBoatsSunk >= 10) {
             winner = true;
         }
         return winner;
     }
 
-    public void boatSunk(){
-        System.out.println("El bot hundió un bote");
+    /**
+     * Increments the number of boats sunk by the bot in the current game.
+     * @version 1.0
+     */
+    public void boatSunk() {
         actualGameBoatsSunk++;
     }
 
-    public void restartGame(){
+    /**
+     * Resets the bot's board and game state, clearing all boats and resetting the sunk boat count.
+     * @version 1.0
+     */
+    public void restartGame() {
         allBoatsUsed.clear();
-        Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
-        System.out.println(allBoatsUsed);
+        Collections.addAll(allBoatsUsed, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
         actualGameBoatsSunk = 0;
         winner = false;
 
-        for(int i = 0; i<10;i++){
-            for(int j = 0; j<10;j++){
-                board.get(i).set(i,0);
-                boardWithBoats.get(i).set(i,null);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                board.get(i).set(i, 0);
+                boardWithBoats.get(i).set(i, null);
             }
         }
     }
-
-
-
-    //    public int RandomBoatSelector() {
-//        Random random = new Random();
-//        int randomBoatNumber = 0;
-//        int randomIndex = 0;
-//        randomIndex = random.nextInt(allBoatsUsed.toArray().length);
-//        do {
-//            randomBoatNumber = (allBoatsUsed.get(randomIndex) != 0 ? allBoatsUsed.get(randomIndex) : 0);
-//            if (randomBoatNumber == 0) {
-//                randomIndex = (randomIndex == allBoatsUsed.toArray().length - 1 ? 0 : randomIndex + 1);
-//            }
-//        } while (randomBoatNumber == 0);
-//
-//        allBoatsUsed.set(randomIndex, 0);
-//
-//        return randomBoatNumber;
-//    }
-
-
 }
