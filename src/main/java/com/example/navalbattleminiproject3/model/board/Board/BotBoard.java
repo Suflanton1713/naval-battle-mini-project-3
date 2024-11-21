@@ -225,6 +225,7 @@ public class BotBoard extends BoardAdapter {
         Collections.addAll(allBoatsUsed,1,1,1,1,2,2,2,3,3,4);
         System.out.println(allBoatsUsed);
         actualGameBoatsSunk = 0;
+        winner = false;
 
         for(int i = 0; i<10;i++){
             for(int j = 0; j<10;j++){
