@@ -49,8 +49,8 @@ public class GameController {
     private double mouseAnchorX;
     private double mouseAnchorY;
     private boolean isWatchBotBoardOn = false;
-    private int initialBoatsSunkedWhenLoaded = 0;
-    private int actualBoatsSunkedWhenLoaded = 0;
+    private boolean isLoadingMatch = false;
+    private boolean matchEnded = false;
 
 
     @FXML
@@ -79,7 +79,10 @@ public class GameController {
 
     @FXML
     void handleClickExit(ActionEvent event) {
-        playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+        if(!matchEnded){
+            playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+        }
+
         GameView.deleteInstance();
         WelcomeView.getInstance();
         System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
@@ -90,10 +93,6 @@ public class GameController {
     @FXML
     public void initialize(boolean isLoadedMatch, String loadedProfile) {
         startPlay(isLoadedMatch, loadedProfile);
-    }
-
-    public boolean loadMatch(BotBoard playerBoard, PlayerBoard botBoard){
-        return false;
     }
 
     public void organizePlayerShipsInVBox(int type) {
@@ -686,10 +685,11 @@ public class GameController {
 //                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
 //                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
-                        if(!(initialBoatsSunkedWhenLoaded>actualBoatsSunkedWhenLoaded)){
+                        if(!(isLoadingMatch)){
+                            System.out.println("Empieza a contar puntos------------------------------------------------------");
                             playerBoard.boatSunk();
                         }
-                        actualBoatsSunkedWhenLoaded++;
+
                         playerBoard.isWinnner();
                         System.out.println("DESTRUIDOOOOOOOO");
                         makeBoatDestroyed(row, col,2);
@@ -712,10 +712,10 @@ public class GameController {
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
-                        if(!(initialBoatsSunkedWhenLoaded>actualBoatsSunkedWhenLoaded)){
+                        if(!(isLoadingMatch)){
+                            System.out.println("Empieza a contar puntos------------------------------------------------------");
                             botBoard.boatSunk();
                         }
-                        actualBoatsSunkedWhenLoaded++;
 
                         botBoard.isWinnner();
                         makeBoatDestroyed(row, col,1);
@@ -871,8 +871,8 @@ public void win(int playerOrBot) {
 //        timeline.setCycleCount(10);
 //        timeline.play();
 
-   // playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
-    playerDataHandler.updateProfile(playerBoard.getNickname(), playerBoard.getBoatsSunkEver());
+    playerDataHandler.endMatch(playerBoard.getNickname(), playerBoard.getBoatsSunkEver());
+    matchEnded = true;
 
 
 
@@ -917,6 +917,56 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
         }
     }
 
+    public void loadingMatch(String loadedProfile){
+        isLoadingMatch = true;
+        Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
+
+        playerBoard = (PlayerBoard) returnBoard[0];
+        botBoard =  (BotBoard) returnBoard[1];
+
+        List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
+        List<List<Integer>> temporalBotBoard = new ArrayList<>();
+
+        for (List<Integer> innerList : playerBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalPlayerBoard.add(newInnerList);
+        }
+
+        for (List<Integer> innerList : botBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalBotBoard.add(newInnerList);
+        }
+
+        playerBoard.setBoard(cleanLoadedBoards(playerBoard.getBoard()));
+        botBoard.setBoard(cleanLoadedBoards(botBoard.getBoard()));
+
+        System.out.println("Tableros recogidos de los temporales");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+        createBoardShips();
+        for (int i = 1; i < 5; i++) {
+            organizePlayerShipsInVBox(i);
+        }
+        createBotTable();
+        loadPlayerTable();
+
+
+        handleClickStart();
+
+        loadShootsOnBoard(1, temporalBotBoard);
+        loadShootsOnBoard(2, temporalPlayerBoard);
+
+        System.out.println("Tableros ahora");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+        System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+        System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
+        isLoadingMatch = false;
+    }
+
 
 
 
@@ -924,66 +974,21 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
         playerDataHandler = new PlayerDataHandler();
         Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
         if(isLoadedMatch){
-            Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
+            try{
 
-            playerBoard = (PlayerBoard) returnBoard[0];
-            botBoard =  (BotBoard) returnBoard[1];
+                loadingMatch(loadedProfile);
 
-            System.out.println("Tableros que cargo");
-            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-            System.out.println(botBoard.showBoard(botBoard.getBoard()));
-
-            List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
-            List<List<Integer>> temporalBotBoard = new ArrayList<>();
-
-            for (List<Integer> innerList : playerBoard.getBoard()) {
-                List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
-                temporalPlayerBoard.add(newInnerList);
+            }catch( Exception e){
+                System.out.println("Creating new match. "+e.getMessage());
+                isLoadedMatch = false;
             }
 
-            for (List<Integer> innerList : botBoard.getBoard()) {
-                List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
-                temporalBotBoard.add(newInnerList);
-            }
-
-            playerBoard.setBoard(cleanLoadedBoards(playerBoard.getBoard()));
-            botBoard.setBoard(cleanLoadedBoards(botBoard.getBoard()));
 
 
-            System.out.println("Tableros temporales");
+        }
 
-            System.out.println(temporalPlayerBoard);
-            System.out.println(temporalBotBoard);
+        if(!isLoadedMatch){
 
-            System.out.println("Tableros recogidos de los temporales");
-            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-            System.out.println(botBoard.showBoard(botBoard.getBoard()));
-
-            createBoardShips();
-            for (int i = 1; i < 5; i++) {
-                organizePlayerShipsInVBox(i);
-            }
-            System.out.println("botShips: "+ showArrayBotShips());
-            createBotTable();
-            loadPlayerTable();
-
-
-            handleClickStart();
-
-            initialBoatsSunkedWhenLoaded= playerBoard.getActualGameBoatsSunk() + botBoard.getActualGameBoatsSunk();
-            loadShootsOnBoard(1, temporalBotBoard);
-            loadShootsOnBoard(2, temporalPlayerBoard);
-
-            System.out.println("Tableros ahora");
-            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-            System.out.println(botBoard.showBoard(botBoard.getBoard()));
-
-            System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
-            System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
-
-
-
-        }else{
             playerBoard = new PlayerBoard();
             botBoard = new BotBoard();
             createBoardShips();
@@ -995,6 +1000,7 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
             createPlayerTable();
 
         }
+
 
     }
 

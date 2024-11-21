@@ -1,5 +1,7 @@
 package com.example.navalbattleminiproject3.model.board.Exception;
 
+import java.io.IOException;
+
 public class GameException extends Exception {
 
     public GameException() {
@@ -118,7 +120,7 @@ public class GameException extends Exception {
 
 
 
-    public static class CantSaveProfile extends Exception {
+    public static class CantSaveProfile extends IOException {
         public CantSaveProfile() {
             super("Fatal error occurred on saving profile. ");
         }
@@ -126,17 +128,9 @@ public class GameException extends Exception {
         public CantSaveProfile(String message) {
             super("Fatal error occurred on saving profile. "+message);
         }
-
-        public CantSaveProfile(String message, Throwable cause) {
-            super("Fatal error occurred on saving profile." + message, cause);
-        }
-
-        public CantSaveProfile(Throwable cause) {
-            super(cause);
-        }
     }
 
-    public static class CantLoadProfile extends Exception {
+    public static class CantLoadProfile extends IOException {
         public CantLoadProfile() {
             super("Fatal error occurred on loading profile. ");
         }
@@ -144,15 +138,28 @@ public class GameException extends Exception {
         public CantLoadProfile(String message) {
             super("Fatal error occurred on loading profile. " + message);
         }
+    }
 
-        public CantLoadProfile(String message, Throwable cause) {
-            super("Fatal error occurred on loading profile. " + message, cause);
+    public static class CantDeleteFile extends IOException {
+        public CantDeleteFile() {
+            super("Fatal error when deleting serializable file. ");
         }
 
-        public CantLoadProfile(Throwable cause) {
-            super(cause);
+        public CantDeleteFile(String message) {
+            super("Fatal error when deleting serializable file. " + message);
         }
     }
+
+    public static class CantLoadMatch extends NullPointerException {
+        public CantLoadMatch() {
+            super("Fatal error when loading match. ");
+        }
+
+        public CantLoadMatch(String message) {
+            super("Fatal error when loading match. " + message);
+        }
+    }
+
 
 
 }

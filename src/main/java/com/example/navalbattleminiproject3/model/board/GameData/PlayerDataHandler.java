@@ -3,8 +3,11 @@ package com.example.navalbattleminiproject3.model.board.GameData;
 import com.example.navalbattleminiproject3.model.board.Board.BoardAdapter;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
+import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -124,6 +127,32 @@ public class PlayerDataHandler {
         }
 
         return null;
+    }
+
+    public void endMatch(String profileName, int profilePoints){
+        updateProfile(profileName, profilePoints);
+
+        try{
+            File file = new File(directory, profileName + ".ply");
+            File file2 = new File(directory, profileName + ".bot");
+
+            if(!(file.delete() && file2.delete())){
+                throw new GameException.CantDeleteFile("Can't delete serializable when ending match.");
+            }
+
+            System.out.println("La partida antigua ganada fue terminada.");
+
+        }catch(GameException.CantDeleteFile e){
+            System.out.println(e.getMessage());
+
+        }
+
+
+
+        // Intentar eliminar el archivo
+
+
+
     }
 
     public boolean saveMatch(String profileName, PlayerBoard playerBoard, BotBoard botBoard, int profilePoints) {
