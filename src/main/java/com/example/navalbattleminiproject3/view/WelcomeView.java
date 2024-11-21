@@ -65,12 +65,12 @@ public class WelcomeView extends Stage {
 
     private void iniciarPantallaDeCarga() {
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(1), event -> {
+                new KeyFrame(Duration.millis(100), event -> {
                     // Aumentar el ancho de la barra de progreso
                     progressBar.setWidth(progressBar.getWidth() + 12);
                 })
         );
-        timeline.setCycleCount(1); // Cambiado a 100 ciclos
+        timeline.setCycleCount(100); // Cambiado a 100 ciclos
 
         // Al finalizar, eliminar el StackPane y permitir interacción con los elementos
         timeline.setOnFinished(event -> {

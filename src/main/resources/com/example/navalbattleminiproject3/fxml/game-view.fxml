@@ -14,8 +14,8 @@
 
 <GridPane id="GridGameBackground" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.navalbattleminiproject3.controller.GameController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="217.0" minWidth="10.0" prefWidth="178.4000244140625" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="444.79999389648435" minWidth="10.0" prefWidth="427.9999755859375" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="217.0" minWidth="10.0" prefWidth="146.4" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="502.3999755859375" minWidth="10.0" prefWidth="462.4" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="78.0" minWidth="5.0" prefWidth="51.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="427.2000976562499" minWidth="10.0" prefWidth="427.2000976562499" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="187.60006103515616" minWidth="10.0" prefWidth="114.39990234375" />
@@ -28,7 +28,7 @@
    <children>
       <VBox alignment="CENTER" prefHeight="124.0" prefWidth="162.0" GridPane.columnIndex="4">
          <children>
-            <Button id="exitButton" mnemonicParsing="false" onAction="#handleClickExit" prefHeight="37.0" prefWidth="37.0" text="X">
+            <Button id="exitButton" mnemonicParsing="false" onAction="#handleClickExit" prefHeight="37.0" prefWidth="37.0" styleClass="buttons" text="X">
                <font>
                   <Font name="SansSerif Regular" size="22.0" />
                </font>
@@ -224,6 +224,9 @@
             </Label>
             <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" style="-fx-border-color: black;" />
          </children>
+         <GridPane.margin>
+            <Insets left="25.0" />
+         </GridPane.margin>
       </GridPane>
       <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="385.0" prefWidth="385.0" style="-fx-border-color: black;" GridPane.columnIndex="3" GridPane.rowIndex="1">
          <columnConstraints>
@@ -414,9 +417,12 @@
       </GridPane>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2">
          <children>
-            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleClickStart" prefHeight="55.0" prefWidth="154.0" text="empezar disparos" />
+            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleClickStart" prefHeight="55.0" prefWidth="154.0" styleClass="buttons" text="Iniciar combate" textFill="WHITE">
+               <font>
+                  <Font name="Bernard MT Condensed" size="18.0" />
+               </font></Button>
          </children></VBox>
-      <VBox fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="60.0" GridPane.rowIndex="1">
+      <VBox id="vBoxStack" fx:id="shipsVBox" alignment="TOP_CENTER" prefHeight="401.0" prefWidth="138.0" spacing="80.0" GridPane.rowIndex="1">
          <children>
             <StackPane fx:id="stackPane1" prefHeight="35.0" prefWidth="200.0">
                <VBox.margin>
@@ -428,7 +434,7 @@
             <StackPane fx:id="stackPane4" prefHeight="35.0" prefWidth="200.0" />
          </children>
          <GridPane.margin>
-            <Insets top="20.0" />
+            <Insets left="8.0" top="20.0" />
          </GridPane.margin></VBox>
       <GridPane GridPane.columnIndex="3">
         <columnConstraints>
@@ -442,10 +448,13 @@
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
                <children>
-                  <Label text="Bot: ">
+                  <Label text="Bot: " textFill="WHITE">
                      <VBox.margin>
                         <Insets left="20.0" />
                      </VBox.margin>
+                     <font>
+                        <Font size="15.0" />
+                     </font>
                   </Label>
                </children>
             </VBox>
@@ -478,7 +487,10 @@
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
                <children>
-                  <Label text="Player: " />
+                  <Label text="Player: " textFill="WHITE">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                </children>
             </VBox>
             <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0">
@@ -502,5 +514,14 @@
             </StackPane>
          </children>
       </GridPane>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+         <children>
+            <Button mnemonicParsing="false" onAction="#handleWatchBotBoard" prefHeight="26.0" prefWidth="81.0" styleClass="buttons" text="Revelar" textFill="WHITE">
+               <font>
+                  <Font name="Bernard MT Condensed" size="18.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
    </children>
 </GridPane>

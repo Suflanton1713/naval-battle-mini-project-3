@@ -158,6 +158,66 @@ public class WelcomeController {
         instructionStage.showAndWait();
     }
 
+    @FXML
+    void handleClickCredits(ActionEvent event) {
+        Stage creditsStage = new Stage();
+
+        // Configure the instruction stage as a modal window
+        creditsStage.initModality(Modality.WINDOW_MODAL);
+        creditsStage.initStyle(StageStyle.UNDECORATED);
+
+        // Create title label for instructions
+        Label titleLabel = new Label("JUEGO HECHO POR:");
+        titleLabel.setStyle("-fx-text-fill: white;" +  // White color
+                "-fx-font-size: 24px;" +   // Large font size
+                "-fx-font-weight: bold;" + // Bold font
+                "-fx-padding: 10px;");     // Padding around the text
+
+// Create labels for credits information
+        Label creditLabel1 = new Label("Desarrollado por: Libardo Alejandro Quintero, Maria Juliana Saavedra y Juan David Rincón");
+        Label creditLabel2 = new Label("Códigos: 202342032");
+        Label creditLabel3 = new Label("Correo: juan.rincon.lopez@correounivalle.edu.co");
+        Label creditLabel4 = new Label("Materia: Programación Orientada a Eventos - 2024-2");
+
+        // Set style for credit labels
+        creditLabel1.setStyle("-fx-text-fill: white;");
+        creditLabel2.setStyle("-fx-text-fill: white;");
+        creditLabel3.setStyle("-fx-text-fill: white;");
+        creditLabel4.setStyle("-fx-text-fill: white;");
+
+        // Create close button for the credits stage
+        Button closeButton = new Button("Cerrar");
+        closeButton.setOnAction(e -> creditsStage.close());
+        closeButton.setStyle(
+                "-fx-background-color: #55ff00;" +         // Red background
+                        "-fx-text-fill: white;" +              // White text
+                        "-fx-font-weight: bold;" +             // Bold font
+                        "-fx-font-size: 14px;" +               // Font size
+                        "-fx-border-color: white;" +           // White border
+                        "-fx-border-width: 2px;" +             // Border thickness
+                        "-fx-border-radius: 10px;" +           // Rounded borders
+                        "-fx-background-radius: 10px;" +       // Rounded background
+                        "-fx-padding: 5px 10px;"               // Internal padding
+        );
+
+        // Create layout for credits and the close button
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(titleLabel, creditLabel1, creditLabel2, creditLabel3, creditLabel4, closeButton);
+        layout.setStyle("-fx-background-image: url('" + getClass().getResource("/com/example/navalbattleminiproject3/images/backgrounds/fondo_continue.jpg") + "');" +
+                "-fx-background-size: cover;" +
+                "-fx-background-position: center;");
+        layout.setAlignment(Pos.CENTER);
+
+        // Create scene and set it to the instruction stage
+        Scene scene = new Scene(layout, 500, 350);
+        creditsStage.setScene(scene);
+
+        // Show the instruction stage
+        creditsStage.showAndWait();
+    }
+
+
+
 
     @FXML
     void initialize() {

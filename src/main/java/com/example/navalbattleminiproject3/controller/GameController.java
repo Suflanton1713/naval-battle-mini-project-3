@@ -205,7 +205,7 @@ public class GameController {
 
         StackPane root = new StackPane();
         root.setMinSize(type * 35, 35);
-        root.setStyle("-fx-border-color: blue; -fx-border-width: 2; -fx-border-style: solid;");
+
         for (int i = 0; i < type; i++) {
 
 
@@ -473,6 +473,7 @@ public class GameController {
 
              // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
              StackPane ship = getPaneOfShip(type, 2);
+             ship.setVisible(false);
              if (ship == null) return;
 
              // Obtener la dirección del barco desde el tablero del bot
@@ -626,6 +627,8 @@ public class GameController {
     void handleClickStart(ActionEvent event) {
         if(usedPlayerPanes.size()==10) {
             startButton.setDisable(true);
+            labelBotThink.setText("Que la fuerza me guie");
+            labelPlayerThink.setText("¡Al ataque!");
             prepareBotBoardForShot();
         }
 
@@ -844,10 +847,8 @@ public class GameController {
 
     }
 
-
-
     @FXML
-    public void handleWatchBotBoard(ActionEvent event) {
+public void handleWatchBotBoard(ActionEvent event) {
         isWatchBotBoardOn = !isWatchBotBoardOn;
 
         for (Pane ship : usedBotPaneShip) {

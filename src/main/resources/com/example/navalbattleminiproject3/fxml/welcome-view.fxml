@@ -67,7 +67,7 @@
                   <Font name="Tw Cen MT Condensed Extra Bold" size="40.0" />
                </font>
             </Button>
-            <Button id="creditsButton" mnemonicParsing="false" prefHeight="71.0" prefWidth="257.0" styleClass="buttons" text="Credits" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Button id="creditsButton" mnemonicParsing="false" onAction="#handleClickCredits" prefHeight="71.0" prefWidth="257.0" styleClass="buttons" text="Credits" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <font>
                   <Font name="Tw Cen MT Condensed Extra Bold" size="30.0" />
                </font>
@@ -116,7 +116,7 @@
                   <Insets right="5.0" />
                </HBox.margin>
             </ImageView>
-            <Label text="Bienvenido! Juan David" textFill="WHITE" />
+            <Label text="Bienvenido! " textFill="WHITE" />
          </children>
       </HBox>
    </top>

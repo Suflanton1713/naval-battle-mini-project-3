@@ -62,15 +62,17 @@ public class GameView extends Stage {
     }
 
     private void StopVideo() {
+        // Configuramos el Timeline para que dure 16 segundos
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(100), event -> {
+                new KeyFrame(Duration.millis(16000), event -> {
                     mainPane.getChildren().clear();
-                    mainPane.getChildren().add(root);
+                    mainPane.getChildren().add(root); // Esto cambia a la vista principal después de 16 segundos
                 })
         );
-        timeline.setCycleCount(1); // Solo 1 ciclo
+        timeline.setCycleCount(1); // Solo 1 ciclo (1 vez)
         timeline.play(); // Inicia el timeline
     }
+
 
     public void setPlayerCharacter(Image character) {
         gameController.setPlayerCharacter(character);
