@@ -719,11 +719,12 @@ public class GameController {
                     node.setOnMouseEntered(event -> handleMouseEnter((Rectangle) node, row, col));
                     node.setOnMouseExited(event -> handleMouseExit((Rectangle) node, row, col));
                     node.setOnMouseClicked(event -> {
+
                         setVisibleBotPlayerCloud(false);
                         resetLabelCloudBotPlayer();
+
                         makeShot(col,row, 1);
                         disableBotBoard(true);
-
                         changeTurnToBot();
                     });
                 }
@@ -942,23 +943,32 @@ public void win(int playerOrBot) {
     ButtonType okButtonType = ButtonType.OK;
     Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
     Label resultsLabel = new Label();
+    Label resultsLabel2 = new Label();
     if (playerOrBot == 1) {
-        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos" + playerBoard.getBoatsSunkEver());
+        resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
+        resultsLabel2.setText("Tu puntaje fue: "+ playerBoard.getBoatsSunkEver()+"\n ¡impresionante!");
     } else {
-        resultsLabel.setText("Felicidades Robii" + "Puntos " + botBoard.getActualGameBoatsSunk());
+        resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
+        resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
     }
     okButton.setStyle(
-            "-fx-background-color: purple; " +
+            "-fx-background-color: #000065; " +
                     "-fx-text-fill: white; " +
                     "-fx-font-size: 25px;"
     );
     resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
-            "-fx-text-fill: black; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 32px;");
+
+    resultsLabel2.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+            "-fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-font-size: 32px;");
 
     VBox content = new VBox();
     content.getChildren().add(resultsLabel);
+    content.getChildren().add(resultsLabel2);
     content.setStyle("-fx-alignment: center;");
     VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
 
