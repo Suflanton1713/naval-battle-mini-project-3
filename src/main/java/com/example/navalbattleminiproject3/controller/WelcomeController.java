@@ -1,5 +1,6 @@
 package com.example.navalbattleminiproject3.controller;
 
+import com.example.navalbattleminiproject3.model.board.GameData.PlayerDataHandler;
 import com.example.navalbattleminiproject3.view.GameView;
 import com.example.navalbattleminiproject3.view.WelcomeView;
 import javafx.event.ActionEvent;
@@ -7,9 +8,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -18,16 +17,26 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.Objects;
+
 public class WelcomeController {
     @FXML
     private ImageView imageHologram;
     @FXML
     private Button buttonSelectCharacter;
     @FXML
+    private TextField txtProfileNewName;
+    @FXML
     private ImageView imageCharacter;
     @FXML
     private Button buttonSide;
     private Image selectedCharacter;
+
+    private String newNameProfile = "PlayerNew";
+
+    private String loadNameProfile;
+
+    private int loadingCounter;
 
 
     private int currentImageIndex = 0;
@@ -51,7 +60,7 @@ public class WelcomeController {
     }
 
     @FXML
-    void handleClickPlay(ActionEvent event) {
+    void handleClickPlay() {
         WelcomeView.deleteInstance();
 
         // Obtener la instancia de GameView
@@ -64,11 +73,35 @@ public class WelcomeController {
         gameView.setBotCharacter(characterImages);
 
         // Iniciar el juego
-        gameView.getGameController().startPlay();
+        gameView.getGameController().initialize(true, newNameProfile);
+    }
+
+    public void continuePlay(){
+        WelcomeView.deleteInstance();
+
+        // Obtener la instancia de GameView
+        GameView gameView = GameView.getInstance();
+
+        // Pasar la imagen seleccionada del jugador
+        gameView.setPlayerCharacter(characterImages[currentImageIndex]);
+
+        // Seleccionar y establecer una imagen aleatoria para el bot
+        gameView.setBotCharacter(characterImages);
+
+        // Iniciar el juego
+        gameView.getGameController().initialize(true, loadNameProfile);
     }
 
     @FXML
-    void handleClickContinue(ActionEvent event) {
+    void handleAceptNickname(ActionEvent event) {
+        // When the button is clicked, get the text from the TextField and print it
+        String text = txtProfileNewName.getText();
+        newNameProfile = text;
+        System.out.println(newNameProfile);
+    }
+
+    @FXML
+    void handleClickContinue() {
         Stage instructionStage = new Stage();
 
         // Configure the instruction stage as a modal window
@@ -113,7 +146,31 @@ public class WelcomeController {
         button2.setOnAction(e -> {
             // When the button is clicked, get the text from the TextField and print it
             String texto = textField.getText();
-            System.out.println(texto);  // Prints the text to the console
+            loadNameProfile = texto;
+            PlayerDataHandler playerDataHandler = new PlayerDataHandler();
+
+            if ((!(Objects.equals(loadNameProfile, "")) && (playerDataHandler.getNicknamesData().contains(loadNameProfile))) || loadingCounter>=1){
+                if(loadingCounter>=1){
+                    loadNameProfile = "Player";
+                }
+                continuePlay();
+                instructionStage.close();
+            }else{
+                loadingCounter++;
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Ingresa un usuario valido!");
+                alert.setHeaderText("Ingresa un usuario valido");
+                alert.setContentText("Digita tu usuario para poder cargar el juego. Asegurate de haberlo creado antes. Si vuelves a ingresar sin usuario se cargará la partida por defecto.");
+
+                // Personalizar el estilo del Alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleWelcome.css").toExternalForm());
+                dialogPane.getStyleClass().add("custom-alert");
+
+                // Mostrar el Alert
+                alert.showAndWait();
+            }
+
         });
 
         VBox vbox3 = new VBox();

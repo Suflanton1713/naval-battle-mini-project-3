@@ -131,10 +131,13 @@ public class Boats implements Serializable {
                 throw new GameException.InaccessiblePartInBoat("Trying to destroy a non-existence part in boat");
             }
 
-            boatDamaged.set(partsDestroyed, damageUbication);
-            partsDestroyed++;
-            System.out.println(boatDamaged);
-            isBoatDestroyed();
+            if(!boatDamaged.contains(damageUbication)){
+                System.out.println("El bote no ha sido destruído completamente.");
+                boatDamaged.set(partsDestroyed, damageUbication);
+                partsDestroyed++;
+                System.out.println(boatDamaged);
+                isBoatDestroyed();
+            }
 
         }catch(GameException.InaccessiblePartInBoat e){
             System.out.println(e.getMessage());

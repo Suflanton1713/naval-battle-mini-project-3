@@ -223,7 +223,9 @@ public class PlayerBoard extends BoardAdapter{
         //Higher than 0 coz all the negative numbers represent already shooted boxes
         if(boxNumber > 0){
             setNumberByIndex(attackedBoard.getBoard(),((-1)*boxNumber), row, column);
+            System.out.println("Verify the shoot on boat");
             modifiedBoatPart = getObjectByIndex(attackedBoard.getBoardWithBoats(), row, column);
+            System.out.println("Destroy part on boat");
             modifiedBoatPart.destroyBoatParts(row,column);
             isBoatDestroyed = modifiedBoatPart.getBoatDestroyed();
             return isBoatDestroyed;

@@ -43,3 +43,23 @@
     -fx-border-width: 2px;
     -fx-border-color: #fafa4b;
 }
+
+
+.custom-alert {
+    -fx-background-color: #d0e7ff; /* Azul claro */
+    -fx-font-family: "Arial"; /* Fuente */
+    -fx-text-fill: black; /* Texto negro */
+}
+
+.custom-alert .header-panel {
+    -fx-background-color: #a7c4ff; /* Azul más oscuro para el encabezado */
+    -fx-text-fill: black; /* Texto negro */
+}
+
+.custom-alert .content {
+    -fx-text-fill: black; /* Texto negro del contenido */
+}
+
+.custom-alert .button-bar {
+    -fx-background-color: #d0e7ff; /* Azul claro para los botones */
+}

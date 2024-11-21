@@ -1,5 +1,4 @@
 package com.example.navalbattleminiproject3.controller;
-
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
@@ -23,17 +22,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
     private PlayerDataHandler playerDataHandler;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
+    private List<Boats> usedPlayerBoatsForLoad = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
     private List<StackPane> playerPaneShips = new ArrayList<>(10);
     private List<StackPane> botPaneShips = new ArrayList<>(10);
@@ -46,6 +44,10 @@ public class GameController {
     private double mouseAnchorY;
     private boolean isWatchBotBoardOn = true;
     private int missingPlayerShips = 10;
+    private boolean isLoadingMatch = false;
+    private boolean matchEnded = false;
+    private boolean matchStarted = false;
+    private int profilePointsLoaded;
 
 
     @FXML
@@ -89,6 +91,11 @@ public class GameController {
     @FXML
     private Label labelPlayerThink;
 
+    @FXML
+    public void initialize(boolean isLoadedMatch, String loadedProfile) {
+        startPlay(isLoadedMatch, loadedProfile);
+    }
+
 
     // Método para establecer la imagen del bot
     public void setBotCharacter(Image character) {
@@ -105,25 +112,34 @@ public class GameController {
     }
 
     @FXML
-    void handleClickExit(ActionEvent event) {
+    void handleClickExit() {
+        if(!matchEnded){
+            if(matchStarted){
+                playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+            }else{
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No se guardará tu partida.");
+                alert.setHeaderText("No se guardará tu partida.");
+                alert.setContentText("Si quieres guardar tu partida, deberás desplegar a toda tu flota de naves. Sólo se guardará tu usuario.");
+
+                // Personalizar el estilo del Alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleWelcome.css").toExternalForm());
+                dialogPane.getStyleClass().add("custom-alert");
+
+                // Mostrar el Alert
+                alert.showAndWait();
+
+                playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getBoatsSunkEver() );
+            }
+        }
+
         GameView.deleteInstance();
         WelcomeView.getInstance();
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
     }
 
-
-    @FXML
-    public void initialize() {
-        playerDataHandler = new PlayerDataHandler();
-        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
-        playerBoard = new PlayerBoard();
-        botBoard = new BotBoard();
-        createBoardShips();
-        for (int i = 1; i < 5; i++) {
-            organizePlayerShipsInVBox(i);
-        }
-        System.out.println("botShips: "+ showArrayBotShips());
-
-    }
 
     public void organizePlayerShipsInVBox(int type) {
           switch (type) {
@@ -630,13 +646,14 @@ public class GameController {
     }
 
     @FXML
-    void handleClickStart(ActionEvent event) {
+    void handleClickStart() {
         if(usedPlayerPanes.size()==10) {
             startButton.setDisable(true);
             setVisibleBotPlayerCloud(true);
             labelBotThink.setText("Que la Fuerza me guíe");
             labelPlayerThink.setText("¡Al ataque!");
             prepareBotBoardForShot();
+            matchStarted = true;
         }
     }
     public void changeTurnToBot(){
@@ -814,7 +831,10 @@ public class GameController {
 //                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
 //                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
+                        if(!isLoadingMatch){
                         playerBoard.boatSunk();
+                        }
+
                         playerBoard.isWinnner();
                         System.out.println("DESTRUIDOOOOOOOO");
                         makeBoatDestroyed(row, col,2);
@@ -837,7 +857,9 @@ public class GameController {
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
-                        botBoard.boatSunk();
+                        if(!isLoadingMatch) {
+                            botBoard.boatSunk();
+                        }
                         botBoard.isWinnner();
                         makeBoatDestroyed(row, col,1);
 
@@ -957,6 +979,9 @@ public void handleWatchBotBoard(ActionEvent event) {
 public void win(int playerOrBot) {
     playerBoard.restartGame();
     botBoard.restartGame();
+    playerDataHandler.endMatch(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+    matchEnded = true;
+
     Alert alert = new Alert(Alert.AlertType.INFORMATION);
     alert.setTitle("YOU WON! CONGRATULATIONS!");
     alert.setHeaderText(null);
@@ -969,7 +994,7 @@ public void win(int playerOrBot) {
     Label resultsLabel2 = new Label();
     if (playerOrBot == 1) {
         resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
-        resultsLabel2.setText("Tu puntaje fue: "+ playerBoard.getBoatsSunkEver()+"\n ¡impresionante!");
+        resultsLabel2.setText("Acumulas un puntaje de: "+ (profilePointsLoaded + playerBoard.getActualGameBoatsSunk())+"\n ¡impresionante!");
     } else {
         resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
         resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
@@ -1008,17 +1033,203 @@ public void win(int playerOrBot) {
 //        timeline.setCycleCount(10);
 //        timeline.play();
 
-    playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
-
-
-
 }
 
-    public void startPlay() {
+
+    public void loadPlayerTable(){
+        positionBotShipsToSetNull = 0;
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Rectangle rect = new Rectangle(35, 35);
+                rect.setFill(Color.LIGHTBLUE);
+                rect.setStroke(Color.BLACK);
+                playerGridPane.add(rect, j, i);
+            }
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                int shipType = playerBoard.getNumberByIndex(playerBoard.getBoard(), i, j);
+                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
+                    if(!(usedPlayerBoatsForLoad.contains(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j)))){
+                        positionPlayerShipsWithDirection(shipType,i,j);
+                        usedPlayerBoatsForLoad.add(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j));
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void positionPlayerShipsWithDirection(int type, int row, int col){
+        StackPane ship = getPaneOfShip(type,1);
+        ship.setDisable(true);
+        ship.setFocusTraversable(false);
+        int boardDirection = playerBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+
+        if (boardDirection==0|| boardDirection==2){
+
+
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
+
+            playerPaneShips.set(positionBotShipsToSetNull, null);
+
+        }else{
+
+            rotateBoat(ship, 2);
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
+            playerPaneShips.set(positionBotShipsToSetNull, null);
+
+        }
+    }
+
+    public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
+        for (List<Integer> row : board) {
+            System.out.println(row);
+            for(int i=0; i<row.size(); i++){
+                if(row.get(i)==(-6)) {
+                    row.set(i, 0);
+                }
+                if(row.get(i)<0){
+                    row.set(i, row.get(i)*(-1));
+                }
+            }
+        }
+        System.out.println("Se limpió tablero");
+        System.out.println(board);
+        return board;
+
+    }
+
+    public void loadShootsOnBoard(int playerOrBot, List<List<Integer>> shootedReferenceboard) {
+        for (int i = 0; i < shootedReferenceboard.size(); i++) {
+            for (int j = 0; j < shootedReferenceboard.get(i).size(); j++) {
+                System.out.println("Número en " +i+j + " :" +shootedReferenceboard.get(i).get(j));
+
+                if (shootedReferenceboard.get(i).get(j) < 0) {
+                    System.out.println("DISPARO");
+                    if (playerOrBot == 2){
+                        playerBoard.shootInOtherBoard(playerBoard, i, j);
+                        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+                    }
+                    makeShot(i,j,playerOrBot);
+                    //Shoot of boat from player
+                    System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+                    System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+                }
+
+            }
+        }
+    }
+
+    public void loadingMatch(String loadedProfile){
+
+
+        isLoadingMatch = true;
+        Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
+
+        playerBoard = (PlayerBoard) returnBoard[0];
+        botBoard =  (BotBoard) returnBoard[1];
+
+
+
+        List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
+        List<List<Integer>> temporalBotBoard = new ArrayList<>();
+
+        for (List<Integer> innerList : playerBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalPlayerBoard.add(newInnerList);
+        }
+
+        for (List<Integer> innerList : botBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalBotBoard.add(newInnerList);
+        }
+
+        playerBoard.setBoard(cleanLoadedBoards(playerBoard.getBoard()));
+        botBoard.setBoard(cleanLoadedBoards(botBoard.getBoard()));
+
+        System.out.println("Tableros recogidos de los temporales");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+        createBoardShips();
+        for (int i = 1; i < 5; i++) {
+            organizePlayerShipsInVBox(i);
+        }
         createBotTable();
-        createPlayerTable();
+        loadPlayerTable();
+
+
+        handleClickStart();
+
+        System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+        System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
+
+        loadShootsOnBoard(1, temporalBotBoard);
+        loadShootsOnBoard(2, temporalPlayerBoard);
+
+        System.out.println("Tableros ahora");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+        System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+        System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
+        isLoadingMatch = false;
+    }
+
+
+
+
+    public void startPlay(boolean isLoadedMatch, String loadedProfile){
+        playerDataHandler = new PlayerDataHandler();
+        System.out.println("perfiles creados " + playerDataHandler.getNicknamesData());
         imgBotCloud.setVisible(false);
         imgPlayerCloud.setVisible(false);
+        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+        if(isLoadedMatch){
+            try{
+
+                loadingMatch(loadedProfile);
+
+                matchStarted=true;
+                profilePointsLoaded = playerBoard.getBoatsSunkEver();
+
+                System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+                System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
+            }catch( Exception e){
+                System.out.println("Creating new match. "+e.getMessage());
+                isLoadedMatch = false;
+                isLoadingMatch = false;
+            }
+
+
+
+        }
+
+        if(!isLoadedMatch){
+
+            playerBoard = new PlayerBoard();
+            playerBoard.setNickname(loadedProfile);
+            botBoard = new BotBoard();
+            createBoardShips();
+            for (int i = 1; i < 5; i++) {
+                organizePlayerShipsInVBox(i);
+            }
+            System.out.println("botShips: "+ showArrayBotShips());
+            createBotTable();
+            createPlayerTable();
+
+
+        }
+
+
     }
 
 }
