@@ -20,3 +20,10 @@
     -fx-pref-height: 200px; /* Alto preferido de la alerta */
 
 }
+
+#GridGameBackground{
+    -fx-background-image: url('../images/backgrounds/gameBackground.png');
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+
