@@ -169,7 +169,7 @@ public class GameController {
         root.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-style: solid;");
 
         for (int i = 0; i < type; i++) {
-            Rectangle rect = new Rectangle(35, 35);
+            Rectangle rect = new Rectangle(20, 20);
             rect.setFill(Color.PINK);
             rect.setStroke(Color.RED);
 
@@ -215,6 +215,9 @@ public class GameController {
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
                             if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
+                                ship.setBackground(new Background(
+                                        new BackgroundFill(Color.rgb(0, 0, 0, 0), CornerRadii.EMPTY, null)
+                                ));
                                 placeBoatInCell(ship, row, col, playerGridPane);
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
@@ -311,22 +314,20 @@ public class GameController {
      public void positionBotShipWithDirection(int type, int row, int col){
         Pane ship = getPaneOfShip(type,2);
         int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
-         System.out.println("tipo de barco que se agarró: "+type+" direccion: "+boardDirection
-         + " fila: "+row+" column: "+col);
+
         if (boardDirection==0|| boardDirection==2){
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
+
             placeBoatInCell(ship,row,col,botGridPane);
             usedBotPaneShip.add(ship);
             botPaneShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
 
         }else{
+
             rotateBoat(ship, 2);
-            System.out.println("antes de posicionar: "+ "pane: "+ ship + "fil: "+ row+ "col: "+col);
             placeBoatInCell(ship,row,col,botGridPane);
             usedBotPaneShip.add(ship);
             botPaneShips.set(positionBotShipsToSetNull, null);
-            System.out.println("despues de posicionar: "+ showArrayBotShips());
+
         }
      }
 
@@ -414,6 +415,7 @@ public class GameController {
             default -> 0;
         };
 
+
         for (int i = 0; i <= num; i++) {
             int directionCol = col, DirectionRow = row;
             switch (direction) {
@@ -446,6 +448,7 @@ public class GameController {
     }
 
     public void handleMouseExit(Rectangle rect, int row, int col) {
+        clearHoverEffect();
         for (Pane ship : playerPaneShips) {
             if (ship != null && ship.isFocused()) {
                 int shipType = getPlayerShipType(ship);
