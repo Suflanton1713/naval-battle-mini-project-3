@@ -685,11 +685,11 @@ public class GameController {
 //                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
 //                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
-                        if(!(isLoadingMatch)){
+                        if(!isLoadingMatch){
                             System.out.println("Empieza a contar puntos------------------------------------------------------");
                             playerBoard.boatSunk();
-                        }
 
+                        }
                         playerBoard.isWinnner();
                         System.out.println("DESTRUIDOOOOOOOO");
                         makeBoatDestroyed(row, col,2);
@@ -712,7 +712,7 @@ public class GameController {
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
-                        if(!(isLoadingMatch)){
+                        if(!isLoadingMatch){
                             System.out.println("Empieza a contar puntos------------------------------------------------------");
                             botBoard.boatSunk();
                         }
@@ -839,7 +839,7 @@ public void win(int playerOrBot) {
     Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
     Label resultsLabel = new Label();
     if (playerOrBot == 1) {
-        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos" + playerBoard.getBoatsSunkEver());
+        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos " + playerBoard.getBoatsSunkEver()+ playerBoard.getActualGameBoatsSunk());
     } else {
         resultsLabel.setText("Felicidades Robii" + "Puntos " + botBoard.getActualGameBoatsSunk());
     }
@@ -871,7 +871,7 @@ public void win(int playerOrBot) {
 //        timeline.setCycleCount(10);
 //        timeline.play();
 
-    playerDataHandler.endMatch(playerBoard.getNickname(), playerBoard.getBoatsSunkEver());
+    playerDataHandler.endMatch(playerBoard.getNickname(), playerBoard.getBoatsSunkEver() + playerBoard.getActualGameBoatsSunk());
     matchEnded = true;
 
 
@@ -918,11 +918,15 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
     }
 
     public void loadingMatch(String loadedProfile){
+
+
         isLoadingMatch = true;
         Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
 
         playerBoard = (PlayerBoard) returnBoard[0];
         botBoard =  (BotBoard) returnBoard[1];
+
+
 
         List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
         List<List<Integer>> temporalBotBoard = new ArrayList<>();
@@ -954,6 +958,10 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
 
         handleClickStart();
 
+        System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+        System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
+
         loadShootsOnBoard(1, temporalBotBoard);
         loadShootsOnBoard(2, temporalPlayerBoard);
 
@@ -978,9 +986,13 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
 
                 loadingMatch(loadedProfile);
 
+                System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+                System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+
             }catch( Exception e){
                 System.out.println("Creating new match. "+e.getMessage());
                 isLoadedMatch = false;
+                isLoadingMatch = false;
             }
 
 
