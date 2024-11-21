@@ -1,18 +1,23 @@
 package com.example.navalbattleminiproject3.view;
 
 import com.example.navalbattleminiproject3.controller.GameController;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
 public class GameView extends Stage {
     private Parent root;
     private GameController gameController;
+    private StackPane mainPane;
 
     public GameView() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/navalbattleminiproject3/fxml/game-view.fxml"));
@@ -23,7 +28,12 @@ public class GameView extends Stage {
             e.printStackTrace();
         }
 
-        Scene scene = new Scene(root,1200,670);
+        VideoView videoView = new VideoView();
+        mainPane = new StackPane(videoView.getMainPane());
+        StopVideo();
+
+        // Configurar la escena y ventana
+        Scene scene = new Scene(mainPane, 1200, 670);
         scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
         setScene(scene);
         setTitle("Sudoku");
@@ -51,5 +61,25 @@ public class GameView extends Stage {
         GameViewHolder.INSTANCE = null;
     }
 
+    private void StopVideo() {
+        // Configuramos el Timeline para que dure 16 segundos
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(16000), event -> {
+                    mainPane.getChildren().clear();
+                    mainPane.getChildren().add(root); // Esto cambia a la vista principal después de 16 segundos
+                })
+        );
+        timeline.setCycleCount(1); // Solo 1 ciclo (1 vez)
+        timeline.play(); // Inicia el timeline
+    }
 
+
+    public void setPlayerCharacter(Image character) {
+        gameController.setPlayerCharacter(character);
+    }
+
+    public void setBotCharacter(Image[] botImages) {
+        int randomIndex = (int) (Math.random() * botImages.length);
+        gameController.setBotCharacter(botImages[randomIndex]);
+    }
 }

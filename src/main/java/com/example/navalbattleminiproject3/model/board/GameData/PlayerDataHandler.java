@@ -32,9 +32,9 @@ public class PlayerDataHandler {
             pointsData = new LinkedList<>();
             for (int i = 0; i < temporalArray.length; i++) {
                 if (i % 2 == 0) {
-                    nicknamesData.add(temporalArray[i]);
+                    nicknamesData.add(temporalArray[i].trim());
                 } else {
-                    pointsData.add(temporalArray[i]);
+                    pointsData.add(temporalArray[i].trim());
                 }
             }
 
@@ -110,7 +110,7 @@ public class PlayerDataHandler {
         try {
 
             if(!(isProfileCreated(profileName))) {
-                throw new IllegalArgumentException("Profile " + profileName + " is not created");
+                throw new GameException.CantLoadMatch("Profile " + profileName + " is not created");
             }
 
             returnBoards[0] = (PlayerBoard) serializableData.deserializeData(profileName + ".ply");
@@ -118,7 +118,7 @@ public class PlayerDataHandler {
 
             return returnBoards;
 
-        } catch (IllegalArgumentException e1){
+        } catch (GameException.CantLoadMatch e1){
             System.out.println("An error has been ocurred. " + e1.getMessage());
             createProfile(profileName);
 
@@ -217,15 +217,20 @@ public class PlayerDataHandler {
 
     public void updateProfile(String profileName, int profilePoints){
         try {
+            System.out.println("Los perfiles existentes son "+nicknamesData);
             if(!(nicknamesData.contains(profileName))){
-                throw new IllegalArgumentException("Profile does not exist");
+                throw new GameException.profilesDoesNotExist("Profile does not exist");
             }
 
             plainData.writeToFile("data_panda.csv", profileName + "," + String.valueOf(profilePoints));
             pointsData.set(nicknamesData.indexOf(profileName), String.valueOf(profilePoints));
 
-        }catch(IllegalArgumentException e) {
+        }catch(GameException.profilesDoesNotExist e) {
             System.out.println("An error has been ocurred. " + e.getMessage());
+            System.out.println("Creating new profile");
+            createProfile(profileName);
+        } catch (Exception e1) {
+            System.out.println("An error has been ocurred. " + e1.getMessage());
             System.out.println("Creating new profile");
             createProfile(profileName);
         }

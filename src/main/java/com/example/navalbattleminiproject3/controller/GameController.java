@@ -1,24 +1,22 @@
 package com.example.navalbattleminiproject3.controller;
 
-import com.example.navalbattleminiproject3.model.board.Board.BoardAdapter;
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
 import com.example.navalbattleminiproject3.model.board.GameData.PlayerDataHandler;
-import com.example.navalbattleminiproject3.model.board.GameData.SerializableGameData;
 import com.example.navalbattleminiproject3.model.board.GamePieces.Boats;
-import com.example.navalbattleminiproject3.view.GameView;
-import com.example.navalbattleminiproject3.view.WelcomeView;
-import javafx.animation.KeyFrame;
+import com.example.navalbattleminiproject3.view.*;
 import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -29,7 +27,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Stack;
 
 
 public class GameController {
@@ -39,8 +37,8 @@ public class GameController {
     private List<Boats> usedBotBoats = new ArrayList<>(10);
     private List<Boats> usedPlayerBoatsForLoad = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
-    private List<Pane> playerPaneShips = new ArrayList<>(10);
-    private List<Pane> botPaneShips = new ArrayList<>(10);
+    private List<StackPane> playerPaneShips = new ArrayList<>(10);
+    private List<StackPane> botPaneShips = new ArrayList<>(10);
     private List<Integer> temporaryNumberBoats = new ArrayList<>(10);
     private List<Pane> usedBotPaneShip = new ArrayList<>(10);
     int positionBotShipsToSetNull = 0;
@@ -49,8 +47,11 @@ public class GameController {
     private double mouseAnchorX;
     private double mouseAnchorY;
     private boolean isWatchBotBoardOn = false;
+    private int missingPlayerShips = 10;
     private boolean isLoadingMatch = false;
     private boolean matchEnded = false;
+    private boolean matchStarted = false;
+    private int profilePointsLoaded;
 
 
     @FXML
@@ -73,14 +74,68 @@ public class GameController {
     @FXML
     private StackPane stackPane4;
 
-
     @FXML
     private Button startButton;
 
     @FXML
-    void handleClickExit(ActionEvent event) {
+    private ImageView imgPlayer;
+
+    @FXML
+    private ImageView imgBot;
+
+    @FXML
+    private ImageView imgBotCloud;
+
+    @FXML
+    private ImageView imgPlayerCloud;
+
+    @FXML
+    private Label labelBotThink;
+
+    @FXML
+    private Label labelPlayerThink;
+
+    @FXML
+    public void initialize(boolean isLoadedMatch, String loadedProfile) {
+        startPlay(isLoadedMatch, loadedProfile);
+    }
+
+
+    // Método para establecer la imagen del bot
+    public void setBotCharacter(Image character) {
+        if (imgBot != null) {
+            imgBot.setImage(character);
+        }
+    }
+
+
+    public void setPlayerCharacter(Image character) {
+        if (imgPlayer != null) {
+            imgPlayer.setImage(character);
+        }
+    }
+
+    @FXML
+    void handleClickExit() {
         if(!matchEnded){
-            playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+            if(matchStarted){
+                playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+            }else{
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No se guardará tu partida.");
+                alert.setHeaderText("No se guardará tu partida.");
+                alert.setContentText("Si quieres guardar tu partida, deberás desplegar a toda tu flota de naves. Sólo se guardará tu usuario.");
+
+                // Personalizar el estilo del Alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleWelcome.css").toExternalForm());
+                dialogPane.getStyleClass().add("custom-alert");
+
+                // Mostrar el Alert
+                alert.showAndWait();
+
+                playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getBoatsSunkEver() );
+            }
         }
 
         GameView.deleteInstance();
@@ -89,11 +144,6 @@ public class GameController {
         System.out.println(botBoard.showBoard(botBoard.getBoard()));
     }
 
-
-    @FXML
-    public void initialize(boolean isLoadedMatch, String loadedProfile) {
-        startPlay(isLoadedMatch, loadedProfile);
-    }
 
     public void organizePlayerShipsInVBox(int type) {
           switch (type) {
@@ -158,29 +208,84 @@ public class GameController {
 
     public void createBoardShips(){
         for(int i = 0; i<10; i++){
-            Pane playerShip = createShip(temporaryNumberBoats.get(i),1);
-            Pane botShip = createShip(temporaryNumberBoats.get(i),2);
+            StackPane playerShip = (StackPane) createShip(temporaryNumberBoats.get(i),1);
+            StackPane botShip = (StackPane) createShip(temporaryNumberBoats.get(i),2);
+
+            //botShip.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-style: solid;");
             playerPaneShips.add(playerShip);
             botPaneShips.add(botShip);
+
         }
     }
 
-    public Pane createShip(int type, int playerOrBot) {
-        Pane root = new Pane();
-        root.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-border-style: solid;");
+    public StackPane createShip(int type, int playerOrBot) {
 
+        StackPane root = new StackPane();
+        root.setMinSize(type * 35, 35);
+        root.setStyle("-fx-border-color: blue; -fx-border-width: 2; -fx-border-style: solid;");
         for (int i = 0; i < type; i++) {
-            Rectangle rect = new Rectangle(20, 20);
-            rect.setFill(Color.PINK);
-            rect.setStroke(Color.RED);
 
-            rect.setX(i * 35);
-            rect.setY(0);
 
-            root.getChildren().add(rect);
+            if(type == 1){
+                StarView star = new StarView();
+                Group starRoot = star.getRoot();
+                starRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                starRoot.setLayoutY(0);
+                starRoot.setScaleX(0.17);
+                starRoot.setScaleY(0.17);
+
+                // Añadir al barco
+                root.getChildren().add(starRoot);
+
+            } else if (type == 2) {
+                HalconView halcon = new HalconView();
+                Group halconRoot = halcon.getRoot();
+                halconRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                halconRoot.setLayoutY(0);
+
+                // Ajustar el tamaño y la posición dentro de la celda
+
+                halconRoot.setScaleX(0.25);
+                halconRoot.setScaleY(0.25);
+
+                // Añadir al barco
+                root.getChildren().add(halconRoot);
+
+            } else if (type == 3) {
+                AlaView ala = new AlaView();
+                Group AlaRoot = ala.getRoot();
+                AlaRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                AlaRoot.setLayoutY(0);
+
+                // Ajustar el tamaño y la posición dentro de la celda
+
+                AlaRoot.setScaleX(0.3);
+                AlaRoot.setScaleY(0.25);
+
+                // Añadir al barco
+                root.getChildren().add(AlaRoot);
+
+
+            } else if (type == 4) {
+                DestructorView destructor = new DestructorView();
+                Group destructorRoot = destructor.getRoot();
+                destructorRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
+                destructorRoot.setLayoutY(0);
+
+                // Ajustar el tamaño y la posición dentro de la celda
+
+                destructorRoot.setScaleX(0.4);
+                destructorRoot.setScaleY(0.25);
+
+                // Añadir al barco
+                root.getChildren().add(destructorRoot);
+
+            }
+
+            root.setPrefSize(type * 35, 35);
         }
 
-        root.setPrefSize(type * 35, 35);
+
 
         root.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         if(playerOrBot == 1){
@@ -196,12 +301,14 @@ public class GameController {
 
             root.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 for (Node node : root.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        Rectangle rect = (Rectangle) node;
-                        if (newValue) {
-                            rect.setFill(Color.LAWNGREEN);
-                        } else {
-                            rect.setFill(Color.PINK);
+                    if (node instanceof Group) {
+                        // Cambiar el color del Halcón cuando se enfoca
+                        Group halconRoot = (Group) node;
+                        for (Node child : halconRoot.getChildren()) {
+                            if (child instanceof Circle) {
+                                Circle circle = (Circle) child;
+                                circle.setFill(newValue ? Color.LAWNGREEN : Color.web("#e7e7e7"));
+                            }
                         }
                     }
                 }
@@ -216,45 +323,117 @@ public class GameController {
 
                         if (col < playerGridPane.getColumnCount() && row < playerGridPane.getRowCount()) {
                             if(playerBoard.spawnBoat(row,col,getShipDirection(ship),getPlayerShipType(ship))){
-                                ship.setBackground(new Background(
-                                        new BackgroundFill(Color.rgb(0, 0, 0, 0), CornerRadii.EMPTY, null)
-                                ));
                                 placeBoatInCell(ship, row, col, playerGridPane);
+                                missingPlayerShips--;
+                                imgPlayerCloud.setVisible(true);
+                                labelPlayerThink.setText("Quedan "+missingPlayerShips+" naves para la batalla");
+                                if(missingPlayerShips==0){
+                                    labelPlayerThink.setText("¡La estrategia está lista! preciona iniciar");
+                                }
                                 ship.setDisable(true);
                                 usedPlayerPanes.add(ship);
                                 organizePlayerShipsInVBox(getPlayerShipType(ship));
                             }else{
                                 hoverPlayerBoard(row,col,getPlayerShipType(ship),getShipDirection(ship),Color.RED);
                             }
-
-                            System.out.println("-------------AQUIIIII---------------------------------------------------------");
-                            System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
-                            System.out.println("direction: "+getShipDirection(ship));
-                            System.out.println("type: "+getPlayerShipType(ship));
                         }
 
                         break;
                     }
                 }
             });
-//            makeDraggable(root);
-//            root.setOnMouseClicked(event -> rotateBoat(root));
+
         }
 
 
         return root;
     }
 
-    public int getPlayerShipType(Pane ship){
+
+    public int getPlayerShipType(Pane ship) {
         for (int i = 0; i < playerPaneShips.size(); i++) {
             if (playerPaneShips.get(i) == ship) {
+                return temporaryNumberBoats.get(i);
+            }
+            if (botPaneShips.get(i) == ship) {
                 return temporaryNumberBoats.get(i);
             }
         }
         return -1;
     }
+    public void rotateBoat(StackPane boat, int  playerOrBot) {
+        int actualAngle = (int) ((boat.getRotate() % 360 + 360) % 360);
+        int shipType = getPlayerShipType(boat);
+        System.out.println("Estoy a tanto de ángulo "+actualAngle);
+        if(shipType == 1 ){
+            if (actualAngle == 0){
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 90){
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }}
 
-    public void rotateBoat(Pane boat, int  playerOrBot) {
+        if(shipType == 2 ){
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-35);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(-17);
+            } else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+
+
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            }
+        }
+        if(shipType == 3 ){
+            if (actualAngle == 0){
+                boat.setTranslateX(-35);
+                boat.setTranslateY(35);
+            }
+            else if (actualAngle == 90){
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(-35);
+                boat.setTranslateY(-35);
+            }
+            else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }}
+
+        if(shipType == 4 ) {
+            if (actualAngle == 0) {
+                boat.setTranslateX(-52);
+                boat.setTranslateY(52);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-105);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(-52);
+                boat.setTranslateY(-52);
+            }
+        }
+
+
         boat.setDisable(true);
 
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(300), boat);
@@ -270,13 +449,13 @@ public class GameController {
         rotateTransition.play();
     }
 
+
     public int getShipDirection(Pane ship) {
         int actualAngle = (int) ((ship.getRotate() % 360 + 360) % 360);
 
         if (actualAngle > 360) {
             actualAngle = actualAngle % 360;
         }
-
         return switch (actualAngle) {
             case 0 -> 0;
             case 90 -> 3;
@@ -284,11 +463,8 @@ public class GameController {
             case 270 -> 1;
             default -> -1;
         };
-
     }
-
     public void createBotTable(){
-
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 Rectangle rect = new Rectangle(35, 35);
@@ -297,7 +473,6 @@ public class GameController {
                 botGridPane.add(rect, j, i);
             }
         }
-
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 int shipType = botBoard.getNumberByIndex(botBoard.getBoard(), i, j);
@@ -309,81 +484,31 @@ public class GameController {
                 }
             }
         }
-
-    }
-
-
-    public void loadPlayerTable(){
-        positionBotShipsToSetNull = 0;
-
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                Rectangle rect = new Rectangle(35, 35);
-                rect.setFill(Color.LIGHTBLUE);
-                rect.setStroke(Color.BLACK);
-                playerGridPane.add(rect, j, i);
-            }
-        }
-
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                int shipType = playerBoard.getNumberByIndex(playerBoard.getBoard(), i, j);
-                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
-                    if(!(usedPlayerBoatsForLoad.contains(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j)))){
-                        positionPlayerShipsWithDirection(shipType,i,j);
-                        usedPlayerBoatsForLoad.add(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j));
-                    }
-                }
-            }
-        }
-
     }
      public void positionBotShipWithDirection(int type, int row, int col){
-        Pane ship = getPaneOfShip(type,2);
-        int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
 
-        if (boardDirection==0|| boardDirection==2){
+             // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
+             StackPane ship = getPaneOfShip(type, 2);
+             if (ship == null) return;
 
+             // Obtener la dirección del barco desde el tablero del bot
+             int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
 
-            placeBoatInCell(ship,row,col,botGridPane);
-            usedBotPaneShip.add(ship);
-            botPaneShips.set(positionBotShipsToSetNull, null);
+             // Rotar el barco si es necesario antes de colocarlo
+             if (boardDirection == 1 || boardDirection == 3) {
+                 rotateBoat(ship, 2);
+             }
 
-        }else{
+             // Colocar el barco de manera consistente en el grid
+             placeBoatInCell(ship, row, col, botGridPane);
+             usedBotPaneShip.add(ship);
 
-            rotateBoat(ship, 2);
-            placeBoatInCell(ship,row,col,botGridPane);
-            usedBotPaneShip.add(ship);
-            botPaneShips.set(positionBotShipsToSetNull, null);
+             // Marcar este barco como usado en la lista de barcos del bot
+             botPaneShips.set(positionBotShipsToSetNull, null);
 
-        }
      }
 
-    public void positionPlayerShipsWithDirection(int type, int row, int col){
-        Pane ship = getPaneOfShip(type,1);
-        ship.setDisable(true);
-        ship.setFocusTraversable(false);
-        int boardDirection = playerBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
-
-        if (boardDirection==0|| boardDirection==2){
-
-
-            placeBoatInCell(ship,row,col,playerGridPane);
-            usedPlayerPanes.add(ship);
-
-            playerPaneShips.set(positionBotShipsToSetNull, null);
-
-        }else{
-
-            rotateBoat(ship, 2);
-            placeBoatInCell(ship,row,col,playerGridPane);
-            usedPlayerPanes.add(ship);
-            playerPaneShips.set(positionBotShipsToSetNull, null);
-
-        }
-    }
-
-    public Pane getPaneOfShip(int type, int playerOrBot) {
+    public StackPane getPaneOfShip(int type, int playerOrBot) {
 
         int startIndex ;
         int endIndex;
@@ -410,14 +535,13 @@ public class GameController {
                 return null;
         }
 
-        List<Pane> shipsList = (playerOrBot == 1) ? playerPaneShips : botPaneShips;
+        List<StackPane> shipsList = (playerOrBot == 1) ? playerPaneShips : botPaneShips;
 
         for (int i = startIndex; i < endIndex; i++) {
             if (shipsList.get(i) != null) {
-                Pane ship = shipsList.get(i);
+                StackPane ship = shipsList.get(i);
                 positionBotShipsToSetNull = i;
                 return ship;
-
             }
         }
         return null;
@@ -467,7 +591,6 @@ public class GameController {
             default -> 0;
         };
 
-
         for (int i = 0; i <= num; i++) {
             int directionCol = col, DirectionRow = row;
             switch (direction) {
@@ -515,13 +638,26 @@ public class GameController {
         grid.add(ship, col, row);
     }
 
+    public void setVisibleBotPlayerCloud(boolean visible) {
+        imgBotCloud.setVisible(visible);
+        imgPlayerCloud.setVisible(visible);
+    }
+
+    public void resetLabelCloudBotPlayer(){
+        labelBotThink.setText("");
+        labelPlayerThink.setText("");
+    }
+
     @FXML
     void handleClickStart() {
         if(usedPlayerPanes.size()==10) {
             startButton.setDisable(true);
+            setVisibleBotPlayerCloud(true);
+            labelBotThink.setText("Que la Fuerza me guíe");
+            labelPlayerThink.setText("¡Al ataque!");
             prepareBotBoardForShot();
+            matchStarted = true;
         }
-
     }
     public void changeTurnToBot(){
 
@@ -540,20 +676,15 @@ public class GameController {
             disablePlayerBoard(false);
             disableBotBoard(true);
 
+            imgBotCloud.setVisible(true);
+            labelBotThink.setText("Preparando disparo");
             PauseTransition pause = new PauseTransition(Duration.seconds(0.5)); // 2 segundos de pausa
             pause.setOnFinished(event -> {
                 int[] destroyedPart;
                 destroyedPart = botBoard.randomShootInOtherBoard(playerBoard);
                 int row = destroyedPart[0];
                 int col = destroyedPart[1];
-                System.out.println("row: " + row + " col: " + col);
-                System.out.println("Después del disparo: ");
-                System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
                 makeShot(row, col, 2);
-                System.out.println("Tablero del jugador\n" + playerBoard.showBoard(playerBoard.getBoard()));
-
-                System.out.println("Botes destruidos por jugador: " + botBoard.getActualGameBoatsSunk());
-                System.out.println("El bot ganó: " + botBoard.isWinnner());
 
                 // Verificar si el juego terminó
                 if (!botBoard.isWinnner()) {
@@ -566,6 +697,8 @@ public class GameController {
                     win(2);
                     System.out.println("Juego terminado");
                 }
+                imgBotCloud.setVisible(false);
+                labelBotThink.setText("");
 
 
             });
@@ -606,8 +739,13 @@ public class GameController {
                     node.setOnMouseEntered(event -> handleMouseEnter((Rectangle) node, row, col));
                     node.setOnMouseExited(event -> handleMouseExit((Rectangle) node, row, col));
                     node.setOnMouseClicked(event -> {
+
+                        setVisibleBotPlayerCloud(false);
+                        resetLabelCloudBotPlayer();
+
                         makeShot(col,row, 1);
                         disableBotBoard(true);
+
                         changeTurnToBot();
                     });
                 }
@@ -643,32 +781,43 @@ public class GameController {
                 System.out.println(botBoard.showBoard(botBoard.getBoard()));
                 type = botBoard.getNumberByIndex(botBoard.getBoard(),row,col);
             }else{
-                System.out.println("Realiza el tiro bot---------------------------------------------------------------");
                 type = playerBoard.getNumberByIndex(playerBoard.getBoard(),row,col);
                 System.out.println("row: "+row+" col: "+col);
                 System.out.println("type: " + type);
             }
 
-            Circle shot = new Circle();
-            shot.setRadius(10);
-            shot.setTranslateX(7.5);
+
+
+
+
             System.out.println("Shoot on boat type, "+type );
-            switch (type) {
-                case -6:
-                    shot.setFill(Color.CHOCOLATE);
-                    break;
-                case -1:
-                    shot.setFill(Color.GREEN);
-                    break;
-                case -2:
-                    shot.setFill(Color.PURPLE);
-                    break;
-                case -3:
-                    shot.setFill(Color.DARKRED);
-                    break;
-                case -4:
-                    shot.setFill(Color.ROYALBLUE);
-                    break;
+
+            StackPane shotPane = new StackPane();
+            if (type == -6) {
+                FailShot failShot = new FailShot();
+                Group ShotGroup = failShot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
+            }
+            else{
+                Bomb Shot = new Bomb();
+                Group ShotGroup = Shot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
             }
             if (playerOrBot==1){
 //                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
@@ -686,20 +835,19 @@ public class GameController {
 //                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
                     if(isDestroyed){
                         if(!isLoadingMatch){
-                            System.out.println("Empieza a contar puntos------------------------------------------------------");
-                            playerBoard.boatSunk();
-
+                        playerBoard.boatSunk();
                         }
+
                         playerBoard.isWinnner();
                         System.out.println("DESTRUIDOOOOOOOO");
                         makeBoatDestroyed(row, col,2);
                         System.out.println("DESTRUIDOOOOOOOO");
                     }else{
-                        botGridPane.add(shot, col, row);
+                        botGridPane.add(shotPane, col, row);
                     }
 
                 }else{
-                    botGridPane.add(shot, col, row);
+                    botGridPane.add(shotPane, col, row);
                 }
 
             }else{
@@ -712,29 +860,24 @@ public class GameController {
                     System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
 
                     if(isDestroyed){
-                        if(!isLoadingMatch){
-                            System.out.println("Empieza a contar puntos------------------------------------------------------");
+                        if(!isLoadingMatch) {
                             botBoard.boatSunk();
                         }
-
                         botBoard.isWinnner();
                         makeBoatDestroyed(row, col,1);
 
                     }else{
-                        System.out.println("Le pega al barco " +type);
-                        playerGridPane.add(shot, col, row);
+                        playerGridPane.add(shotPane, col, row);
                     }
 
                 }else{
-                    System.out.println("Le pega al agua y pone disparo al agua" +type);
-                    playerGridPane.add(shot, col, row);
+                    playerGridPane.add(shotPane, col, row);
                 }
 
             }
 
         }catch(Exception e){
             System.out.println("Some error has ocurred.");
-            e.printStackTrace();
         }
 
     }
@@ -766,16 +909,26 @@ public class GameController {
                 for (List<Integer> row2 : boatUbication) {
                     int fila = row2.get(0);
                     int column = row2.get(1);
-                    Circle shot = new Circle();
-                    shot.setRadius(10);
-                    shot.setTranslateX(7.5);
-                    shot.setFill(Color.YELLOW);
+                    StackPane shotroot = new StackPane();
+                    Fire shot = new Fire();
+                    Group shotRoot = shot.getRoot();
+                    shotRoot.setScaleX(0.25);
+                    shotRoot.setScaleY(0.25);
+                    shotroot.setTranslateX(-35);
+                    shotroot.setTranslateY(0);
+                    shotroot.getChildren().add(shotRoot);
+                    shotroot.setPrefSize(35, 35); // Tamaño preferido
+                    shotroot.setMinSize(35, 35);  // Tamaño mínimo
+                    shotroot.setMaxSize(35, 35);
+                    shotroot.setTranslateX(0);
+
+
                     if(playerOrBot==1){
-                        playerGridPane.add(shot, column, fila);
+                        playerGridPane.add(shotroot, column, fila);
                         System.out.println("yellow shot in: fila "+fila+" columna "+column);
                     }else{
                         System.out.println("yellow shot in: fila "+fila+" columna "+column);
-                        botGridPane.add(shot, column, fila);
+                        botGridPane.add(shotroot, column, fila);
                     }
                 }
             }
@@ -789,7 +942,7 @@ public class GameController {
     }
 
     @FXML
-    public void handleWatchBotBoard(ActionEvent event) {
+public void handleWatchBotBoard(ActionEvent event) {
         isWatchBotBoardOn = !isWatchBotBoardOn;
 
         for (Pane ship : usedBotPaneShip) {
@@ -829,6 +982,9 @@ public class GameController {
 public void win(int playerOrBot) {
     playerBoard.restartGame();
     botBoard.restartGame();
+    playerDataHandler.endMatch(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+    matchEnded = true;
+
     Alert alert = new Alert(Alert.AlertType.INFORMATION);
     alert.setTitle("YOU WON! CONGRATULATIONS!");
     alert.setHeaderText(null);
@@ -838,23 +994,32 @@ public void win(int playerOrBot) {
     ButtonType okButtonType = ButtonType.OK;
     Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
     Label resultsLabel = new Label();
+    Label resultsLabel2 = new Label();
     if (playerOrBot == 1) {
-        resultsLabel.setText("Felicidades " + playerBoard.getNickname() + ", Puntos " + playerBoard.getBoatsSunkEver()+ playerBoard.getActualGameBoatsSunk());
+        resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
+        resultsLabel2.setText("Acumulas un puntaje de: "+ (profilePointsLoaded + playerBoard.getActualGameBoatsSunk())+"\n ¡impresionante!");
     } else {
-        resultsLabel.setText("Felicidades Robii" + "Puntos " + botBoard.getActualGameBoatsSunk());
+        resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
+        resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
     }
     okButton.setStyle(
-            "-fx-background-color: purple; " +
+            "-fx-background-color: #000065; " +
                     "-fx-text-fill: white; " +
                     "-fx-font-size: 25px;"
     );
     resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
-            "-fx-text-fill: black; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 32px;");
+
+    resultsLabel2.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+            "-fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-font-size: 32px;");
 
     VBox content = new VBox();
     content.getChildren().add(resultsLabel);
+    content.getChildren().add(resultsLabel2);
     content.setStyle("-fx-alignment: center;");
     VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
 
@@ -871,14 +1036,60 @@ public void win(int playerOrBot) {
 //        timeline.setCycleCount(10);
 //        timeline.play();
 
-    playerDataHandler.endMatch(playerBoard.getNickname(), playerBoard.getBoatsSunkEver() + playerBoard.getActualGameBoatsSunk());
-    matchEnded = true;
-
-
-
 }
 
-public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
+
+    public void loadPlayerTable(){
+        positionBotShipsToSetNull = 0;
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Rectangle rect = new Rectangle(35, 35);
+                rect.setFill(Color.LIGHTBLUE);
+                rect.setStroke(Color.BLACK);
+                playerGridPane.add(rect, j, i);
+            }
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                int shipType = playerBoard.getNumberByIndex(playerBoard.getBoard(), i, j);
+                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
+                    if(!(usedPlayerBoatsForLoad.contains(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j)))){
+                        positionPlayerShipsWithDirection(shipType,i,j);
+                        usedPlayerBoatsForLoad.add(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j));
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void positionPlayerShipsWithDirection(int type, int row, int col){
+        StackPane ship = getPaneOfShip(type,1);
+        ship.setDisable(true);
+        ship.setFocusTraversable(false);
+        int boardDirection = playerBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+
+        if (boardDirection==0|| boardDirection==2){
+
+
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
+
+            playerPaneShips.set(positionBotShipsToSetNull, null);
+
+        }else{
+
+            rotateBoat(ship, 2);
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
+            playerPaneShips.set(positionBotShipsToSetNull, null);
+
+        }
+    }
+
+    public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
         for (List<Integer> row : board) {
             System.out.println(row);
             for(int i=0; i<row.size(); i++){
@@ -890,11 +1101,11 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
                 }
             }
         }
-    System.out.println("Se limpió tablero");
-    System.out.println(board);
+        System.out.println("Se limpió tablero");
+        System.out.println(board);
         return board;
 
-}
+    }
 
     public void loadShootsOnBoard(int playerOrBot, List<List<Integer>> shootedReferenceboard) {
         for (int i = 0; i < shootedReferenceboard.size(); i++) {
@@ -980,11 +1191,17 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
 
     public void startPlay(boolean isLoadedMatch, String loadedProfile){
         playerDataHandler = new PlayerDataHandler();
+        System.out.println("perfiles creados " + playerDataHandler.getNicknamesData());
+        imgBotCloud.setVisible(false);
+        imgPlayerCloud.setVisible(false);
         Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
         if(isLoadedMatch){
             try{
 
                 loadingMatch(loadedProfile);
+
+                matchStarted=true;
+                profilePointsLoaded = playerBoard.getBoatsSunkEver();
 
                 System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
                 System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
@@ -1002,6 +1219,7 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
         if(!isLoadedMatch){
 
             playerBoard = new PlayerBoard();
+            playerBoard.setNickname(loadedProfile);
             botBoard = new BotBoard();
             createBoardShips();
             for (int i = 1; i < 5; i++) {
@@ -1010,6 +1228,7 @@ public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
             System.out.println("botShips: "+ showArrayBotShips());
             createBotTable();
             createPlayerTable();
+
 
         }
 

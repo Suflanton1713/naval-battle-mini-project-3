@@ -21,10 +21,8 @@ import java.io.IOException;
 public class WelcomeView extends Stage {
     private Parent root;
     private ImageView loadingImage;
-    private Rectangle progressBar; // Barra de progreso
+    private Rectangle progressBar;
     private StackPane mainPane;
-    private Image characters;
-
 
     public WelcomeView() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/navalbattleminiproject3/fxml/welcome-view.fxml"));
@@ -34,8 +32,6 @@ public class WelcomeView extends Stage {
             e.printStackTrace();
         }
 
-
-
         // Crear la imagen de carga
         loadingImage = new ImageView(new Image(getClass().getResourceAsStream("/com/example/navalbattleminiproject3/images/backgrounds/loading-image.jpg")));
         loadingImage.setFitWidth(1200);
@@ -43,16 +39,17 @@ public class WelcomeView extends Stage {
 
         // Crear la barra de progreso
         progressBar = new Rectangle(0, 20, Color.DODGERBLUE);
-        progressBar.setHeight(20);  // Altura de la barra de progreso
-        progressBar.setOpacity(0.8);  // Un poco de transparencia
+        progressBar.setHeight(20);
+        progressBar.setOpacity(0.8);
 
-        // Crear un VBox para colocar la barra de progreso debajo de la imagen de carga
+        // Añadir imagen y barra de progreso a un VBox
         VBox loadingContainer = new VBox(loadingImage, progressBar);
-        loadingContainer.setAlignment(Pos.CENTER); // Centrar los elementos
+        loadingContainer.setAlignment(Pos.CENTER);
 
-        // Crear un StackPane para superponer la imagen sobre la escena principal
-        mainPane = new StackPane(root, loadingContainer);
+        // Crear el StackPane para el video
+        mainPane = new StackPane(loadingContainer);
 
+        // Configurar la escena y ventana
         Scene scene = new Scene(mainPane, 1200, 670);
         scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleWelcome.css").toExternalForm());
         setScene(scene);
@@ -67,20 +64,18 @@ public class WelcomeView extends Stage {
     }
 
     private void iniciarPantallaDeCarga() {
-        // Crear una línea de tiempo para aumentar el ancho de la barra de progreso durante 10 segundos
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(1), event -> {
+                new KeyFrame(Duration.millis(100), event -> {
                     // Aumentar el ancho de la barra de progreso
                     progressBar.setWidth(progressBar.getWidth() + 12);
                 })
         );
-        timeline.setCycleCount(1); // Aumenta la barra en 100 pasos (esto hará que dure 10 segundos)
+        timeline.setCycleCount(100); // Cambiado a 100 ciclos
 
         // Al finalizar, eliminar el StackPane y permitir interacción con los elementos
         timeline.setOnFinished(event -> {
-            // Limpiar el StackPane y agregar solo el contenido original
             mainPane.getChildren().clear();
-            mainPane.getChildren().add(root); // Añadir solo el contenido original de la vista
+            mainPane.getChildren().add(root);
         });
 
         timeline.play();

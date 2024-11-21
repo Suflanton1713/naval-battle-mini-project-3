@@ -48,7 +48,7 @@ public class GameException extends Exception {
         }
     }
 
-    public static class BoxAlreadyActivated extends Exception {
+    public static class BoxAlreadyActivated extends IndexOutOfBoundsException {
         public BoxAlreadyActivated() {
             super();
         }
@@ -57,31 +57,16 @@ public class GameException extends Exception {
             super(mensaje);
         }
 
-        public BoxAlreadyActivated(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public BoxAlreadyActivated(Throwable cause) {
-            super(cause);
-        }
     }
 
 
-    public static class boatAlreadyUsed extends Exception {
+    public static class boatAlreadyUsed extends NullPointerException {
         public boatAlreadyUsed() {
             super();
         }
 
         public boatAlreadyUsed(String mensaje) {
             super(mensaje);
-        }
-
-        public boatAlreadyUsed(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public boatAlreadyUsed(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -127,6 +112,16 @@ public class GameException extends Exception {
 
         public CantSaveProfile(String message) {
             super("Fatal error occurred on saving profile. "+message);
+        }
+    }
+
+    public static class profilesDoesNotExist extends NullPointerException {
+        public profilesDoesNotExist() {
+            super("Fatal error occurred on searching profile. ");
+        }
+
+        public profilesDoesNotExist(String message) {
+            super("Fatal error occurred on searching profile. "+message);
         }
     }
 

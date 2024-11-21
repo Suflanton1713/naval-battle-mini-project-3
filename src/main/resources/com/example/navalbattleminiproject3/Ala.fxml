@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Ellipse?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.shape.Rectangle?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="166.0" prefWidth="329.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+         <Ellipse fill="#dfdfdf" layoutX="186.0" layoutY="89.0" radiusX="136.0" radiusY="22.0" stroke="BLACK" strokeType="INSIDE" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="22.0" layoutX="71.0" layoutY="62.0" stroke="BLACK" strokeType="INSIDE" width="28.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="22.0" layoutX="71.0" layoutY="91.0" stroke="BLACK" strokeType="INSIDE" width="28.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffae51" height="15.0" layoutX="39.0" layoutY="66.0" stroke="BLACK" strokeType="INSIDE" width="33.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffae51" height="15.0" layoutX="39.0" layoutY="95.0" stroke="BLACK" strokeType="INSIDE" width="33.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="50.0" layoutX="68.0" layoutY="15.0" stroke="BLACK" strokeType="INSIDE" width="32.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="50.0" layoutX="69.0" layoutY="111.0" stroke="BLACK" strokeType="INSIDE" width="32.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="4.0" layoutX="24.0" layoutY="15.0" stroke="BLACK" strokeType="INSIDE" width="200.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#dfdfdf" height="4.0" layoutX="33.0" layoutY="158.0" stroke="BLACK" strokeType="INSIDE" width="200.0" />
+         <Polygon fill="#dfdfdf" layoutX="100.0" layoutY="77.0" points="-51.66667556762695, -11.000007629394531, -30.00000762939453, -11.000007629394531, -30.00000762939453, -62.000003814697266" stroke="BLACK" strokeType="INSIDE" />
+         <Polygon fill="#dfdfdf" layoutX="110.0" layoutY="87.0" points="-62.26667022705078, 22.99999237060547, -39.866668701171875, 22.99999237060547, -39.866668701171875, 70.06666564941406" stroke="BLACK" strokeType="INSIDE" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#4fc2ff" height="15.0" layoutX="151.0" layoutY="79.0" stroke="BLACK" strokeType="INSIDE" width="42.0" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffca68" height="6.0" layoutX="198.0" layoutY="84.0" stroke="BLACK" strokeType="INSIDE" width="42.0" />
+         <Ellipse fill="#ffca68" layoutX="297.0" layoutY="89.0" radiusX="22.0" radiusY="8.0" stroke="BLACK" strokeType="INSIDE" />
+         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#696969" height="8.0" layoutX="61.0" layoutY="84.0" stroke="BLACK" strokeType="INSIDE" width="56.0" />
+   </children>
+</Pane>
