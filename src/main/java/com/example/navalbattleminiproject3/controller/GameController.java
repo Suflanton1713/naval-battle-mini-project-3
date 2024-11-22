@@ -50,6 +50,7 @@ public class GameController {
     private boolean matchEnded = false;
     private boolean matchStarted = false;
     private int profilePointsLoaded;
+    private int initialPointsSunked;
 
     @FXML
     private GridPane botGridPane;
@@ -128,9 +129,14 @@ public class GameController {
      */
     @FXML
     void handleClickExit() {
+        System.out.println("Puntos obtenidos del serializable "+profilePointsLoaded);
+        System.out.println("Puntos de actualGameBoard "+playerBoard.getActualGameBoatsSunk());
+        System.out.println("Puntos que ha hundido ever "+playerBoard.getBoatsSunkEver());
+        int finalPointsSunked = playerBoard.getActualGameBoatsSunk();
+        int differencePoints = finalPointsSunked - initialPointsSunked;
         if(!matchEnded){
             if(matchStarted){
-                playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+                playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, profilePointsLoaded+differencePoints);
             }else{
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("No se guardará tu partida.");
@@ -145,9 +151,17 @@ public class GameController {
                 // Mostrar el Alert
                 alert.showAndWait();
 
-                playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getBoatsSunkEver() );
+                playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded);
             }
+        }else{
+
+            playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded + differencePoints);
+
         }
+
+        System.out.println("Puntos obtenidos del serializable "+profilePointsLoaded);
+        System.out.println("Puntos de actualGameBoard "+playerBoard.getActualGameBoatsSunk());
+        System.out.println("Puntos que ha hundido ever "+playerBoard.getBoatsSunkEver());
 
         GameView.deleteInstance();
         WelcomeView.getInstance();
@@ -1099,10 +1113,13 @@ public class GameController {
      * @version 1.0
      */
     public void win(int playerOrBot) {
+
+        int finalPointsSunked = playerBoard.getActualGameBoatsSunk();
+        int differencePoints = finalPointsSunked - initialPointsSunked;
         playerBoard.restartGame();
         botBoard.restartGame();
-        playerDataHandler.endMatch(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
-        matchEnded = true;
+        playerDataHandler.endMatch(playerBoard.getNickname(), profilePointsLoaded + differencePoints);
+
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("YOU WON! CONGRATULATIONS!");
@@ -1116,10 +1133,10 @@ public class GameController {
         Label resultsLabel2 = new Label();
         if (playerOrBot == 1) {
             resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
-            resultsLabel2.setText("Acumulas un puntaje de: "+ (profilePointsLoaded + playerBoard.getActualGameBoatsSunk())+"\n ¡impresionante!");
+            resultsLabel2.setText("Acumulas un puntaje de: "+ (profilePointsLoaded + differencePoints)+"\n ¡impresionante!");
         } else {
             resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
-            resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
+            resultsLabel2.setText("Fuiste derrotado ");
         }
         okButton.setStyle(
                 "-fx-background-color: #000065; " +
@@ -1333,7 +1350,9 @@ public class GameController {
                 loadingMatch(loadedProfile);
 
                 matchStarted=true;
-                profilePointsLoaded = playerBoard.getBoatsSunkEver();
+                int loadedIndex = playerDataHandler.getNicknamesData().indexOf(loadedProfile);
+                profilePointsLoaded = Integer.parseInt(String.valueOf(playerDataHandler.getPointsData().get(loadedIndex)));
+                initialPointsSunked = playerBoard.getActualGameBoatsSunk();
 
             }catch( Exception e){
                 System.out.println("Creating new match. "+e.getMessage());
@@ -1341,10 +1360,13 @@ public class GameController {
                 isLoadingMatch = false;
             }
         }
+
         if(!isLoadedMatch){
             playerBoard = new PlayerBoard();
             playerBoard.setNickname(loadedProfile);
             botBoard = new BotBoard();
+            profilePointsLoaded = 0;
+            initialPointsSunked = 0;
             createBoardShips();
             for (int i = 1; i < 5; i++) {
                 organizePlayerShipsInVBox(i);
@@ -1352,5 +1374,9 @@ public class GameController {
             createBotTable();
             createPlayerTable();
         }
+
+        System.out.println("Puntos obtenidos del serializable "+profilePointsLoaded);
+        System.out.println("Puntos de actualGameBoard "+playerBoard.getActualGameBoatsSunk());
+        System.out.println("Puntos que ha hundido ever "+playerBoard.getBoatsSunkEver());
     }
 }
