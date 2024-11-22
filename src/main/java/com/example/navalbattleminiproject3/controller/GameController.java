@@ -1,5 +1,4 @@
 package com.example.navalbattleminiproject3.controller;
-
 import com.example.navalbattleminiproject3.model.board.Board.BotBoard;
 import com.example.navalbattleminiproject3.model.board.Board.PlayerBoard;
 import com.example.navalbattleminiproject3.model.board.Exception.GameException;
@@ -23,33 +22,34 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * GameController class manages the game's core logic, including players' boards and game mechanics.
+ * @author Maria Juliana Saavedra, Libardo Alejandro Quintero, Juan David Rincon Lopez
+ * @version 1.0
+ */
 
 public class GameController {
     private PlayerBoard playerBoard;
     private BotBoard botBoard;
     private PlayerDataHandler playerDataHandler;
     private List<Boats> usedBotBoats = new ArrayList<>(10);
+    private List<Boats> usedPlayerBoatsForLoad = new ArrayList<>(10);
     private List<Pane> usedPlayerPanes = new ArrayList<>(10);
     private List<StackPane> playerPaneShips = new ArrayList<>(10);
     private List<StackPane> botPaneShips = new ArrayList<>(10);
     private List<Integer> temporaryNumberBoats = new ArrayList<>(10);
     private List<Pane> usedBotPaneShip = new ArrayList<>(10);
     int positionBotShipsToSetNull = 0;
-    int positionPlayerShipsToSetNull = 0;
-    private int rotationCounter = 0;
-    private double mouseAnchorX;
-    private double mouseAnchorY;
-    private boolean isWatchBotBoardOn = false;
+    private boolean isWatchBotBoardOn = true;
     private int missingPlayerShips = 10;
-
-
-    @FXML
-    private VBox shipsVBox;
+    private boolean isLoadingMatch = false;
+    private boolean matchEnded = false;
+    private boolean matchStarted = false;
+    private int profilePointsLoaded;
 
     @FXML
     private GridPane botGridPane;
@@ -89,44 +89,80 @@ public class GameController {
     @FXML
     private Label labelPlayerThink;
 
+    /**
+     * Initializes the game state with the given parameters.
+     * @param isLoadedMatch true if the game is a loaded match, false otherwise.
+     * @param loadedProfile the profile name of the loaded player.
+     * @see #startPlay(boolean, String)
+     * @version 1.0
+     */
+    @FXML
+    public void initialize(boolean isLoadedMatch, String loadedProfile) {
+        startPlay(isLoadedMatch, loadedProfile);
+    }
 
-    // Método para establecer la imagen del bot
+    /**
+     * Sets the character image for the bot.
+     * @param character the image to represent the bot.
+     * @version 1.0
+     */
     public void setBotCharacter(Image character) {
         if (imgBot != null) {
             imgBot.setImage(character);
         }
     }
-
-
+    /**
+     * Sets the character image for the player.
+     * @param character the image to represent the player.
+     * @version 1.0
+     */
     public void setPlayerCharacter(Image character) {
         if (imgPlayer != null) {
             imgPlayer.setImage(character);
         }
     }
-
+    /**
+     * Handles the exit button click event, saving the game state if necessary.
+     * @throws NullPointerException if any board is null during the process.
+     * @version 1.0
+     */
     @FXML
-    void handleClickExit(ActionEvent event) {
+    void handleClickExit() {
+        if(!matchEnded){
+            if(matchStarted){
+                playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+            }else{
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No se guardará tu partida.");
+                alert.setHeaderText("No se guardará tu partida.");
+                alert.setContentText("Si quieres guardar tu partida, deberás desplegar a toda tu flota de naves. Sólo se guardará tu usuario.");
+
+                // Personalizar el estilo del Alert
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleWelcome.css").toExternalForm());
+                dialogPane.getStyleClass().add("custom-alert");
+
+                // Mostrar el Alert
+                alert.showAndWait();
+
+                playerDataHandler.updateProfile(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getBoatsSunkEver() );
+            }
+        }
+
         GameView.deleteInstance();
         WelcomeView.getInstance();
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
     }
 
-
-    @FXML
-    public void initialize() {
-        playerDataHandler = new PlayerDataHandler();
-        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
-        playerBoard = new PlayerBoard();
-        botBoard = new BotBoard();
-        createBoardShips();
-        for (int i = 1; i < 5; i++) {
-            organizePlayerShipsInVBox(i);
-        }
-        System.out.println("botShips: "+ showArrayBotShips());
-
-    }
-
+    /**
+     * Organizes the player's ships into the specified VBox based on their type.
+     * @param type the type of the ship to organize.
+     * @see StackPane
+     * @version 1.0
+     */
     public void organizePlayerShipsInVBox(int type) {
-          switch (type) {
+        switch (type) {
             case 1:
                 for (int i = 0; i < 4; i++) {
                     if (!(usedPlayerPanes.contains(playerPaneShips.get(i)))) {
@@ -164,28 +200,11 @@ public class GameController {
         }
     }
 
-    public String showArrayBotShips() {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < botPaneShips.size(); i++) {
-            Pane pane = botPaneShips.get(i);
-            result.append("Pane ").append(i + 1).append(": ")
-                    .append(pane != null ? pane.toString() : "null").append("\n");
-        }
-        String output = result.toString();
-        return output;
-    }
-
-    public String showBotUsedShips() {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < usedBotPaneShip.size(); i++) {
-            Pane pane = usedBotPaneShip.get(i);
-            result.append("Pane ").append(i + 1).append(": ")
-                    .append(pane != null ? pane.toString() : "null").append("\n");
-        }
-        String output = result.toString();
-        return output;
-    }
-
+    /**
+     * Creates ships for both the player and the bot and adds them to the board.
+     * @see #createShip(int, int)
+     * @version 1.0
+     */
     public void createBoardShips(){
         for(int i = 0; i<10; i++){
             StackPane playerShip = (StackPane) createShip(temporaryNumberBoats.get(i),1);
@@ -198,8 +217,17 @@ public class GameController {
         }
     }
 
-    public Pane createShip(int type, int playerOrBot) {
-
+    /**
+     * Creates a ship for either the player or the bot based on the type and owner.
+     * Configures the ship's graphical elements and interactions.
+     * @param type the type of the ship, ranging from 1 to 4, determining its size.
+     * @param playerOrBot an integer indicating the owner (1 for player, 2 for bot).
+     * @return a {@code StackPane} representing the created ship.
+     * @see #rotateBoat(StackPane, int)
+     * @see #placeBoatInCell(Pane, int, int, GridPane)
+     * @version 1.0
+     */
+    public StackPane createShip(int type, int playerOrBot) {
         StackPane root = new StackPane();
         root.setMinSize(type * 35, 35);
         root.setStyle("-fx-border-color: blue; -fx-border-width: 2; -fx-border-style: solid;");
@@ -207,7 +235,7 @@ public class GameController {
 
 
             if(type == 1){
-                StarView star= new StarView();
+                StarView star = new StarView();
                 Group starRoot = star.getRoot();
                 starRoot.setLayoutX(i*35); // Ajustar la posición relativa si es necesario
                 starRoot.setLayoutY(0);
@@ -329,57 +357,73 @@ public class GameController {
         return root;
     }
 
-
-    public int getPlayerShipType(Pane ship){
+    /**
+     * Retrieves the type of the given ship based on its index in the player's or bot's list.
+     * @param ship the {@code Pane} representing the ship to identify.
+     * @return an integer representing the type of the ship, or -1 if not found.
+     * @version 1.0
+     */
+    public int getPlayerShipType(Pane ship) {
         for (int i = 0; i < playerPaneShips.size(); i++) {
             if (playerPaneShips.get(i) == ship) {
+                return temporaryNumberBoats.get(i);
+            }
+            if (botPaneShips.get(i) == ship) {
                 return temporaryNumberBoats.get(i);
             }
         }
         return -1;
     }
-
+    /**
+     * Rotates a ship by 90 degrees and adjusts its position to maintain alignment.
+     * Applies specific translations based on the ship's type and angle.
+     * @param boat the {@code StackPane} representing the ship to rotate.
+     * @param playerOrBot an integer indicating the owner (1 for player, 2 for bot).
+     * @see RotateTransition
+     * @throws IllegalArgumentException if the ship type is invalid.
+     * @version 1.0
+     */
     public void rotateBoat(StackPane boat, int  playerOrBot) {
         int actualAngle = (int) ((boat.getRotate() % 360 + 360) % 360);
         int shipType = getPlayerShipType(boat);
         System.out.println("Estoy a tanto de ángulo "+actualAngle);
         if(shipType == 1 ){
             if (actualAngle == 0){
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }
-        else if (actualAngle == 90){
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        } else if (actualAngle == 180) {
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }
-        else if (actualAngle == 270) {
-            boat.setTranslateX(0);
-            boat.setTranslateY(0);
-        }}
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 90){
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
+            else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }}
 
         if(shipType == 2 ){
-                if (actualAngle == 0) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(17);
-                } else if (actualAngle == 90) {
-                    boat.setTranslateX(-35);
-                    boat.setTranslateY(0);
-                } else if (actualAngle == 180) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(-17);
-                } else if (actualAngle == 270) {
-                    boat.setTranslateX(0);
-                    boat.setTranslateY(0);
-                }
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-35);
+                boat.setTranslateY(0);
+            } else if (actualAngle == 180) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(-17);
+            } else if (actualAngle == 270) {
+                boat.setTranslateX(0);
+                boat.setTranslateY(0);
+            }
 
 
-                if (actualAngle == 0) {
-                    boat.setTranslateX(-17);
-                    boat.setTranslateY(17);
-                }
+            if (actualAngle == 0) {
+                boat.setTranslateX(-17);
+                boat.setTranslateY(17);
+            }
         }
         if(shipType == 3 ){
             if (actualAngle == 0){
@@ -390,33 +434,27 @@ public class GameController {
                 boat.setTranslateX(0);
                 boat.setTranslateY(0);
             } else if (actualAngle == 180) {
-                boat.setTranslateX(0);
-                boat.setTranslateY(0);
+                boat.setTranslateX(-35);
+                boat.setTranslateY(-35);
             }
             else if (actualAngle == 270) {
                 boat.setTranslateX(0);
                 boat.setTranslateY(0);
             }}
 
-        if(shipType == 4 ){
-            if (actualAngle == 0){
-                boat.setTranslateX(-17);
-                boat.setTranslateY(17);
-            }
-            else if (actualAngle == 90){
-                boat.setTranslateX(-35);
+        if(shipType == 4 ) {
+            if (actualAngle == 0) {
+                boat.setTranslateX(-52);
+                boat.setTranslateY(52);
+            } else if (actualAngle == 90) {
+                boat.setTranslateX(-105);
                 boat.setTranslateY(0);
             } else if (actualAngle == 180) {
-                boat.setTranslateX(-17);
-                boat.setTranslateY(-17);
+                boat.setTranslateX(-52);
+                boat.setTranslateY(-52);
             }
-            else if (actualAngle == 270) {
-                boat.setTranslateX(0);
-                boat.setTranslateY(0);
-            }}
-
+        }
         boat.setDisable(true);
-
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(300), boat);
         rotateTransition.setByAngle(90);
         rotateTransition.setOnFinished(event -> {
@@ -430,7 +468,12 @@ public class GameController {
         rotateTransition.play();
     }
 
-
+    /**
+     * Gets the current direction of the ship based on its rotation angle.
+     * @param ship the {@code Pane} representing the ship.
+     * @return an integer representing the direction: 0 (right), 1 (up), 2 (left), 3 (down), or -1 if invalid.
+     * @version 1.0
+     */
     public int getShipDirection(Pane ship) {
         int actualAngle = (int) ((ship.getRotate() % 360 + 360) % 360);
 
@@ -445,6 +488,11 @@ public class GameController {
             default -> -1;
         };
     }
+    /**
+     * Creates the bot's game board, initializing its cells and placing the ships.
+     * @see #positionBotShipWithDirection(int, int, int)
+     * @version 1.0
+     */
     public void createBotTable(){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -466,29 +514,44 @@ public class GameController {
             }
         }
     }
-     public void positionBotShipWithDirection(int type, int row, int col){
+    /**
+     * Positions a bot's ship on the board at the specified coordinates.
+     * @param type the type of the ship to position.
+     * @param row the row on the grid where the ship starts.
+     * @param col the column on the grid where the ship starts.
+     * @see #getPaneOfShip(int, int)
+     * @see #placeBoatInCell(Pane, int, int, GridPane)
+     * @version 1.0
+     */
+    public void positionBotShipWithDirection(int type, int row, int col){
+        // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
+        StackPane ship = getPaneOfShip(type, 2);
+        ship.setVisible(false);
+        if (ship == null) return;
 
-             // Obtener el barco del bot de manera similar a como se obtienen los barcos del jugador
-             StackPane ship = getPaneOfShip(type, 2);
-             if (ship == null) return;
+        // Obtener la dirección del barco desde el tablero del bot
+        int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
 
-             // Obtener la dirección del barco desde el tablero del bot
-             int boardDirection = botBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
+        // Rotar el barco si es necesario antes de colocarlo
+        if (boardDirection == 1 || boardDirection == 3) {
+            rotateBoat(ship, 2);
+        }
 
-             // Rotar el barco si es necesario antes de colocarlo
-             if (boardDirection == 1 || boardDirection == 3) {
-                 rotateBoat(ship, 2);
-             }
+        // Colocar el barco de manera consistente en el grid
+        placeBoatInCell(ship, row, col, botGridPane);
+        usedBotPaneShip.add(ship);
 
-             // Colocar el barco de manera consistente en el grid
-             placeBoatInCell(ship, row, col, botGridPane);
-             usedBotPaneShip.add(ship);
+        // Marcar este barco como usado en la lista de barcos del bot
+        botPaneShips.set(positionBotShipsToSetNull, null);
 
-             // Marcar este barco como usado en la lista de barcos del bot
-             botPaneShips.set(positionBotShipsToSetNull, null);
-
-     }
-
+    }
+    /**
+     * Retrieves a ship's graphical representation from the player or bot ship list.
+     * @param type the type of the ship.
+     * @param playerOrBot indicates the owner: 1 for player, 2 for bot.
+     * @return the {@code StackPane} representing the ship, or {@code null} if not found.
+     * @version 1.0
+     */
     public StackPane getPaneOfShip(int type, int playerOrBot) {
 
         int startIndex ;
@@ -528,7 +591,12 @@ public class GameController {
         return null;
     }
 
-
+    /**
+     * Creates the player's game board, initializing its cells and setting up event handlers.
+     * @see #handleMouseEnter(Rectangle, int, int)
+     * @see #handleMouseExit(Rectangle, int, int)
+     * @version 1.0
+     */
     public void createPlayerTable(){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -545,6 +613,10 @@ public class GameController {
         }
     }
 
+    /**
+     * Clears any hover effect applied on the player's board.
+     * @version 1.0
+     */
     public void clearHoverEffect() {
         for (Node node : playerGridPane.getChildren()) {
             if (node instanceof Rectangle rect) {
@@ -552,7 +624,14 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Handles the mouse entering a grid cell, applying a highlight if a ship is focused.
+     * @param rect the {@code Rectangle} representing the grid cell.
+     * @param row the row index of the cell.
+     * @param col the column index of the cell.
+     * @see #hoverPlayerBoard(int, int, int, int, Color)
+     * @version 1.0
+     */
     public void handleMouseEnter(Rectangle rect, int row, int col) {
         for (Pane ship : playerPaneShips) {
             if (ship != null && ship.isFocused()) {
@@ -563,7 +642,16 @@ public class GameController {
         }
         rect.setFill(Color.DARKBLUE);
     }
-
+    /**
+     * Highlights the cells on the player's board based on the ship's type and direction.
+     * @param row the starting row for highlighting.
+     * @param col the starting column for highlighting.
+     * @param type the type of the ship.
+     * @param direction the direction of the ship.
+     * @param highlightColor the {@code Color} to apply as the highlight.
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void hoverPlayerBoard(int row, int col, int type, int direction, Color highlightColor) {
         int num = switch (type) {
             case 2 -> 1;
@@ -590,7 +678,14 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Retrieves a specific node from the grid pane based on its row and column indices.
+     * @param gridPane the {@code GridPane} to search.
+     * @param col the column index.
+     * @param row the row index.
+     * @return the {@code Node} at the specified position, or {@code null} if not found.
+     * @version 1.0
+     */
     public Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             Integer nodeCol = GridPane.getColumnIndex(node);
@@ -602,7 +697,14 @@ public class GameController {
         }
         return null;
     }
-
+    /**
+     * Handles the mouse exiting a grid cell, resetting the hover effect.
+     * @param rect the {@code Rectangle} representing the grid cell.
+     * @param row the row index of the cell.
+     * @param col the column index of the cell.
+     * @see #clearHoverEffect()
+     * @version 1.0
+     */
     public void handleMouseExit(Rectangle rect, int row, int col) {
         clearHoverEffect();
         for (Pane ship : playerPaneShips) {
@@ -614,31 +716,59 @@ public class GameController {
         }
         rect.setFill(Color.LIGHTBLUE);
     }
-
+    /**
+     * Places a ship in a specific cell on the given grid pane.
+     * @param ship the {@code Pane} representing the ship.
+     * @param row the row index of the cell.
+     * @param col the column index of the cell.
+     * @param grid the {@code GridPane} where the ship will be placed.
+     * @version 1.0
+     */
     public void placeBoatInCell(Pane ship, int row, int col, GridPane grid) {
         grid.add(ship, col, row);
     }
-
+    /**
+     * Sets the visibility of the bot and player cloud images.
+     * @param visible {@code true} to make the clouds visible, {@code false} otherwise.
+     * @version 1.0
+     */
     public void setVisibleBotPlayerCloud(boolean visible) {
         imgBotCloud.setVisible(visible);
         imgPlayerCloud.setVisible(visible);
     }
-
+    /**
+     * Resets the text of the labels indicating bot and player thoughts.
+     * @version 1.0
+     */
     public void resetLabelCloudBotPlayer(){
         labelBotThink.setText("");
         labelPlayerThink.setText("");
     }
-
+    /**
+     * Handles the start button click event to initialize the match.
+     * Enables game-related UI elements and prepares the bot board for interaction.
+     * @see #prepareBotBoardForShot()
+     * @see #setVisibleBotPlayerCloud(boolean)
+     * @version 1.0
+     */
     @FXML
-    void handleClickStart(ActionEvent event) {
+    void handleClickStart() {
         if(usedPlayerPanes.size()==10) {
             startButton.setDisable(true);
             setVisibleBotPlayerCloud(true);
             labelBotThink.setText("Que la Fuerza me guíe");
             labelPlayerThink.setText("¡Al ataque!");
             prepareBotBoardForShot();
+            matchStarted = true;
         }
     }
+    /**
+     * Switches the turn to the bot, allowing it to make a move.
+     * Verifies game state after each bot action and determines if the game has ended.
+     * @see #makeShot(int, int, int)
+     * @see #setDisableShotCells()
+     * @version 1.0
+     */
     public void changeTurnToBot(){
 
         disablePlayerBoard(false);
@@ -693,7 +823,12 @@ public class GameController {
             System.out.println("yepissss");
         }
     }
-
+    /**
+     * Disables cells on the bot's board that have already been targeted.
+     * Prevents further interaction with these cells.
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void setDisableShotCells(){
         int num;
         for (int i=0;i<10;i++){
@@ -706,7 +841,14 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Prepares the bot's board for shots, enabling interactions for the player's turn.
+     * Configures event handlers for grid cells to manage player actions.
+     * @see #handleMouseEnter(Rectangle, int, int)
+     * @see #handleMouseExit(Rectangle, int, int)
+     * @see #makeShot(int, int, int)
+     * @version 1.0
+     */
     public void prepareBotBoardForShot(){
         for (Pane ship : usedBotPaneShip) {
             ship.setMouseTransparent(true);
@@ -725,6 +867,7 @@ public class GameController {
 
                         makeShot(col,row, 1);
                         disableBotBoard(true);
+
                         changeTurnToBot();
                     });
                 }
@@ -732,7 +875,12 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Toggles the enabled/disabled state of all cells on the bot's board.
+     * @param disable {@code true} to disable all cells, {@code false} to enable them.
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void disableBotBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -741,6 +889,12 @@ public class GameController {
             }
         }
     }
+    /**
+     * Toggles the enabled/disabled state of all cells on the player's board.
+     * @param disable {@code true} to disable all cells, {@code false} to enable them.
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void disablePlayerBoard(boolean disable){
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -749,7 +903,17 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Handles the logic for executing a shot during the game.
+     * Updates the game board and visual elements based on the outcome of the shot.
+     * @param row the row index where the shot is targeted.
+     * @param col the column index where the shot is targeted.
+     * @param playerOrBot {@code 1} if the shot is from the player, {@code 2} if it's from the bot.
+     * @throws Exception if an error occurs during the shot process.
+     * @see #makeBoatDestroyed(int, int, int)
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void makeShot(int row, int col, int playerOrBot){
         boolean isDestroyed;
         int type;
@@ -764,76 +928,72 @@ public class GameController {
                 System.out.println("row: "+row+" col: "+col);
                 System.out.println("type: " + type);
             }
-
-            Circle shot = new Circle();
-            shot.setRadius(10);
-            shot.setTranslateX(7.5);
             System.out.println("Shoot on boat type, "+type );
-            switch (type) {
-                case -6:
-                    shot.setFill(Color.CHOCOLATE);
-                    break;
-                case -1:
-                    shot.setFill(Color.GREEN);
-                    break;
-                case -2:
-                    shot.setFill(Color.PURPLE);
-                    break;
-                case -3:
-                    shot.setFill(Color.DARKRED);
-                    break;
-                case -4:
-                    shot.setFill(Color.ROYALBLUE);
-                    break;
+
+            StackPane shotPane = new StackPane();
+            if (type == -6) {
+                FailShot failShot = new FailShot();
+                Group ShotGroup = failShot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
+            }
+            else{
+                Bomb Shot = new Bomb();
+                Group ShotGroup = Shot.getRoot();
+                ShotGroup.setScaleX(0.25);
+                ShotGroup.setScaleY(0.25);
+                shotPane.setTranslateX(-35);
+                shotPane.setTranslateY(0);
+                shotPane.getChildren().add(ShotGroup);
+                shotPane.setPrefSize(35, 35); // Tamaño preferido
+                shotPane.setMinSize(35, 35);  // Tamaño mínimo
+                shotPane.setMaxSize(35, 35);
+                shotPane.setTranslateX(0);
             }
             if (playerOrBot==1){
-//                System.out.println("bot board: "+ botBoard.showBoard(botBoard.getBoard()));
-//                System.out.println(row +col);
-//
-//                System.out.println("el que necesitamos bot boats board\n"+botBoard.showBoard(botBoard.getBoardWithBoats()));
-//                System.out.println("el que necesitamos player boats board\n"+playerBoard.showBoard(playerBoard.getBoardWithBoats()));
+
                 if(type !=(-6)){
 
-//                    System.out.println("Hasta aqui llega");
+
                     isDestroyed = botBoard.getObjectByIndex(botBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
-//                    System.out.println("paso is destroted" + isDestroyed);
-//                    System.out.println("shot in row "+row+" col "+col);
-//                    System.out.println(botBoard.showBoard(botBoard.getBoard()));
-//                    System.out.println(botBoard.showBoard(botBoard.getBoardWithBoats()));
+
                     if(isDestroyed){
-                        playerBoard.boatSunk();
+                        if(!isLoadingMatch){
+                            playerBoard.boatSunk();
+                        }
                         playerBoard.isWinnner();
-                        System.out.println("DESTRUIDOOOOOOOO");
                         makeBoatDestroyed(row, col,2);
-                        System.out.println("DESTRUIDOOOOOOOO");
                     }else{
-                        botGridPane.add(shot, col, row);
+                        botGridPane.add(shotPane, col, row);
                     }
 
                 }else{
-                    botGridPane.add(shot, col, row);
+                    botGridPane.add(shotPane, col, row);
                 }
 
             }else{
                 if(type!=(-6)){
-                    System.out.println("Hasta aqui llega");
-
                     isDestroyed = playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),row,col).isBoatDestroyed();
-
-                    System.out.println("paso is destroted" + isDestroyed);
-                    System.out.println("player boats board\n"+playerBoard.showBoard(playerBoard.getBoard()));
-
                     if(isDestroyed){
-                        botBoard.boatSunk();
+                        if(!isLoadingMatch) {
+                            botBoard.boatSunk();
+                        }
                         botBoard.isWinnner();
                         makeBoatDestroyed(row, col,1);
 
                     }else{
-                        playerGridPane.add(shot, col, row);
+                        playerGridPane.add(shotPane, col, row);
                     }
 
                 }else{
-                    playerGridPane.add(shot, col, row);
+                    playerGridPane.add(shotPane, col, row);
                 }
 
             }
@@ -841,9 +1001,17 @@ public class GameController {
         }catch(Exception e){
             System.out.println("Some error has ocurred.");
         }
-
     }
-
+    /**
+     * Marks the specified boat as destroyed, updating its visual representation on the board.
+     * Iterates through the boat's cells to reflect its destruction with a visual effect.
+     * @param row the row index of the boat.
+     * @param col the column index of the boat.
+     * @param playerOrBot {@code 1} for player, {@code 2} for bot.
+     * @throws GameException.OutOfBoardAction if an invalid action occurs on the board.
+     * @see #getNodeFromGridPane(GridPane, int, int)
+     * @version 1.0
+     */
     public void makeBoatDestroyed(int row, int col, int playerOrBot){
 
         try{
@@ -871,16 +1039,26 @@ public class GameController {
                 for (List<Integer> row2 : boatUbication) {
                     int fila = row2.get(0);
                     int column = row2.get(1);
-                    Circle shot = new Circle();
-                    shot.setRadius(10);
-                    shot.setTranslateX(7.5);
-                    shot.setFill(Color.YELLOW);
+                    StackPane shotroot = new StackPane();
+                    Fire shot = new Fire();
+                    Group shotRoot = shot.getRoot();
+                    shotRoot.setScaleX(0.25);
+                    shotRoot.setScaleY(0.25);
+                    shotroot.setTranslateX(-35);
+                    shotroot.setTranslateY(0);
+                    shotroot.getChildren().add(shotRoot);
+                    shotroot.setPrefSize(35, 35); // Tamaño preferido
+                    shotroot.setMinSize(35, 35);  // Tamaño mínimo
+                    shotroot.setMaxSize(35, 35);
+                    shotroot.setTranslateX(0);
+
+
                     if(playerOrBot==1){
-                        playerGridPane.add(shot, column, fila);
+                        playerGridPane.add(shotroot, column, fila);
                         System.out.println("yellow shot in: fila "+fila+" columna "+column);
                     }else{
                         System.out.println("yellow shot in: fila "+fila+" columna "+column);
-                        botGridPane.add(shot, column, fila);
+                        botGridPane.add(shotroot, column, fila);
                     }
                 }
             }
@@ -892,7 +1070,13 @@ public class GameController {
         }
 
     }
-
+    /**
+     * Toggles the visibility of the bot's board based on a user action.
+     * Enables or disables the visibility of bot ships to simulate "watch mode."
+     * @param event the {@code ActionEvent} triggered by the user.
+     * @see #usedBotPaneShip
+     * @version 1.0
+     */
     @FXML
     public void handleWatchBotBoard(ActionEvent event) {
         isWatchBotBoardOn = !isWatchBotBoardOn;
@@ -905,97 +1089,268 @@ public class GameController {
             }
         }
     }
+    /**
+     * Ends the game, declaring a winner and resetting the game state.
+     * Displays an alert with the results and updates the player profile accordingly.
+     * @param playerOrBot {@code 1} if the player wins, {@code 2} if the bot wins.
+     * @see Alert
+     * @see PlayerBoard#restartGame()
+     * @see BotBoard#restartGame()
+     * @version 1.0
+     */
+    public void win(int playerOrBot) {
+        playerBoard.restartGame();
+        botBoard.restartGame();
+        playerDataHandler.endMatch(playerBoard.getNickname(), profilePointsLoaded + playerBoard.getActualGameBoatsSunk());
+        matchEnded = true;
 
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("YOU WON! CONGRATULATIONS!");
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setContentText(null);
+        DialogPane dialogPane = alert.getDialogPane();
+        ButtonType okButtonType = ButtonType.OK;
+        Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
+        Label resultsLabel = new Label();
+        Label resultsLabel2 = new Label();
+        if (playerOrBot == 1) {
+            resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
+            resultsLabel2.setText("Acumulas un puntaje de: "+ (profilePointsLoaded + playerBoard.getActualGameBoatsSunk())+"\n ¡impresionante!");
+        } else {
+            resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
+            resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
+        }
+        okButton.setStyle(
+                "-fx-background-color: #000065; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 25px;"
+        );
+        resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 32px;");
 
+        resultsLabel2.setStyle("-fx-font-family: 'JetBrains Mono'; " +
+                "-fx-text-fill: white; " +
+                "-fx-font-weight: bold; " +
+                "-fx-font-size: 32px;");
 
+        VBox content = new VBox();
+        content.getChildren().add(resultsLabel);
+        content.getChildren().add(resultsLabel2);
+        content.setStyle("-fx-alignment: center;");
+        VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
 
-//    public void makeDraggable(Node node) {
-//        // Variables para almacenar las coordenadas iniciales del nodo
-//        final double[] initialTranslateX = {0};
-//        final double[] initialTranslateY = {0};
-//
-//        // Evento para registrar las coordenadas iniciales
-//        node.setOnMousePressed(mouseEvent -> {
-//            mouseAnchorX = mouseEvent.getSceneX();
-//            mouseAnchorY = mouseEvent.getSceneY();
-//            initialTranslateX[0] = node.getTranslateX();
-//            initialTranslateY[0] = node.getTranslateY();
-//        });
-//
-//        // Evento para actualizar la posición del nodo mientras se arrastra
-//        node.setOnMouseDragged(mouseEvent -> {
-//            double deltaX = mouseEvent.getSceneX() - mouseAnchorX;
-//            double deltaY = mouseEvent.getSceneY() - mouseAnchorY;
-//
-//            node.setTranslateX(initialTranslateX[0] + deltaX);
-//            node.setTranslateY(initialTranslateY[0] + deltaY);
-//        });
-//    }
-public void win(int playerOrBot) {
-    playerBoard.restartGame();
-    botBoard.restartGame();
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("YOU WON! CONGRATULATIONS!");
-    alert.setHeaderText(null);
-    alert.setGraphic(null);
-    alert.setContentText(null);
-    DialogPane dialogPane = alert.getDialogPane();
-    ButtonType okButtonType = ButtonType.OK;
-    Button okButton = (Button) alert.getDialogPane().lookupButton(okButtonType);
-    Label resultsLabel = new Label();
-    Label resultsLabel2 = new Label();
-    if (playerOrBot == 1) {
-        resultsLabel.setText("¡Felicidades " + playerBoard.getNickname() + "! la fuerza está contigo");
-        resultsLabel2.setText("Tu puntaje fue: "+ playerBoard.getBoatsSunkEver()+"\n ¡impresionante!");
-    } else {
-        resultsLabel.setText("¡El poder de la oscuridad triunfa, los rebeldes cayeron ante su fuerza!" );
-        resultsLabel2.setText("Fuiste derrotado, el puntaje de tu oponente fue: " + botBoard.getActualGameBoatsSunk());
+        content.setAlignment(Pos.BOTTOM_CENTER);
+        alert.getDialogPane().setContent(content);
+        dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
+        dialogPane.getStyleClass().add("mi-alerta");
+        alert.show();
     }
-    okButton.setStyle(
-            "-fx-background-color: #000065; " +
-                    "-fx-text-fill: white; " +
-                    "-fx-font-size: 25px;"
-    );
-    resultsLabel.setStyle("-fx-font-family: 'JetBrains Mono'; " +
-            "-fx-text-fill: white; " +
-            "-fx-font-weight: bold; " +
-            "-fx-font-size: 32px;");
 
-    resultsLabel2.setStyle("-fx-font-family: 'JetBrains Mono'; " +
-            "-fx-text-fill: white; " +
-            "-fx-font-weight: bold; " +
-            "-fx-font-size: 32px;");
+    /**
+     * Creates the player's game board from the loaded match data.
+     * Positions all ships and sets up the initial state of the board.
+     * @see #positionPlayerShipsWithDirection(int, int, int)
+     * @version 1.0
+     */
+    public void loadPlayerTable(){
+        positionBotShipsToSetNull = 0;
 
-    VBox content = new VBox();
-    content.getChildren().add(resultsLabel);
-    content.getChildren().add(resultsLabel2);
-    content.setStyle("-fx-alignment: center;");
-    VBox.setMargin(resultsLabel, new Insets(500, 0, 0, 0));
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                Rectangle rect = new Rectangle(35, 35);
+                rect.setFill(Color.LIGHTBLUE);
+                rect.setStroke(Color.BLACK);
+                playerGridPane.add(rect, j, i);
+            }
+        }
 
-    content.setAlignment(Pos.BOTTOM_CENTER);
-    alert.getDialogPane().setContent(content);
-    dialogPane.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
-    dialogPane.getStyleClass().add("mi-alerta");
-    alert.show();
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                int shipType = playerBoard.getNumberByIndex(playerBoard.getBoard(), i, j);
+                if(shipType == 1 || shipType == 2 || shipType == 3 || shipType == 4){
+                    if(!(usedPlayerBoatsForLoad.contains(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j)))){
+                        positionPlayerShipsWithDirection(shipType,i,j);
+                        usedPlayerBoatsForLoad.add(playerBoard.getObjectByIndex(playerBoard.getBoardWithBoats(),i,j));
+                    }
+                }
+            }
+        }
 
-//        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-//            AddPetal(dialogPane);
-//        }));
-//
-//        timeline.setCycleCount(10);
-//        timeline.play();
+    }
+    /**
+     * Positions the player's ships on the board based on their type and direction.
+     * Adjusts the ships' orientation and ensures proper placement on the grid.
+     * @param type the type of the ship.
+     * @param row the starting row index for the ship.
+     * @param col the starting column index for the ship.
+     * @see #rotateBoat(StackPane, int)
+     * @see #placeBoatInCell(Pane, int, int, GridPane)
+     * @version 1.0
+     */
+    public void positionPlayerShipsWithDirection(int type, int row, int col){
+        StackPane ship = getPaneOfShip(type,1);
+        ship.setDisable(true);
+        ship.setFocusTraversable(false);
+        int boardDirection = playerBoard.getBoardWithBoats().get(row).get(col).getBoatDirection();
 
-    playerDataHandler.saveMatch(playerBoard.getNickname(), playerBoard, botBoard, playerBoard.getBoatsSunkEver());
+        if (boardDirection==0|| boardDirection==2){
 
 
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
 
-}
+            playerPaneShips.set(positionBotShipsToSetNull, null);
 
-    public void startPlay() {
+        }else{
+            rotateBoat(ship, 2);
+            placeBoatInCell(ship,row,col,playerGridPane);
+            usedPlayerPanes.add(ship);
+            playerPaneShips.set(positionBotShipsToSetNull, null);
+
+        }
+    }
+    /**
+     * Cleans the board by resetting negative or invalid values to their default state.
+     * @param board the board to clean, represented as a list of lists.
+     * @return the cleaned board.
+     * @version 1.0
+     */
+    public List<List<Integer>> cleanLoadedBoards(List<List<Integer>> board){
+        for (List<Integer> row : board) {
+            System.out.println(row);
+            for(int i=0; i<row.size(); i++){
+                if(row.get(i)==(-6)) {
+                    row.set(i, 0);
+                }
+                if(row.get(i)<0){
+                    row.set(i, row.get(i)*(-1));
+                }
+            }
+        }
+        System.out.println("Se limpió tablero");
+        System.out.println(board);
+        return board;
+
+    }
+    /**
+     * Loads and applies the recorded shots from a saved game on the specified board.
+     * Updates the board with visual indicators of the shots taken.
+     * @param playerOrBot {@code 1} for player, {@code 2} for bot.
+     * @param shootedReferenceboard the reference board with shot records.
+     * @see #makeShot(int, int, int)
+     * @version 1.0
+     */
+    public void loadShootsOnBoard(int playerOrBot, List<List<Integer>> shootedReferenceboard) {
+        for (int i = 0; i < shootedReferenceboard.size(); i++) {
+            for (int j = 0; j < shootedReferenceboard.get(i).size(); j++) {
+                System.out.println("Número en " +i+j + " :" +shootedReferenceboard.get(i).get(j));
+
+                if (shootedReferenceboard.get(i).get(j) < 0) {
+                    System.out.println("DISPARO");
+                    if (playerOrBot == 2){
+                        playerBoard.shootInOtherBoard(playerBoard, i, j);
+                        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+                    }
+                    makeShot(i,j,playerOrBot);
+                    //Shoot of boat from player
+                    System.out.println("Botes hundidos por player en esta partida "+ playerBoard.getActualGameBoatsSunk());
+                    System.out.println("Botes hundidos por bot en esta partida "+  botBoard.getActualGameBoatsSunk());
+                }
+
+            }
+        }
+    }
+    /**
+     * Loads a saved match, reconstructing the board states and game configurations.
+     * Positions ships and applies any saved shots on the respective boards.
+     * @param loadedProfile the profile of the player whose match is being loaded.
+     * @see #cleanLoadedBoards(List)
+     * @see #loadPlayerTable()
+     * @version 1.0
+     */
+    public void loadingMatch(String loadedProfile){
+
+        isLoadingMatch = true;
+        Object[] returnBoard = playerDataHandler.loadMatch(loadedProfile);
+
+        playerBoard = (PlayerBoard) returnBoard[0];
+        botBoard =  (BotBoard) returnBoard[1];
+
+        List<List<Integer>> temporalPlayerBoard = new ArrayList<>();
+        List<List<Integer>> temporalBotBoard = new ArrayList<>();
+
+        for (List<Integer> innerList : playerBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalPlayerBoard.add(newInnerList);
+        }
+
+        for (List<Integer> innerList : botBoard.getBoard()) {
+            List<Integer> newInnerList = new ArrayList<>(innerList); // Crear nueva lista para cada lista interna
+            temporalBotBoard.add(newInnerList);
+        }
+
+        playerBoard.setBoard(cleanLoadedBoards(playerBoard.getBoard()));
+        botBoard.setBoard(cleanLoadedBoards(botBoard.getBoard()));
+
+        System.out.println("Tableros recogidos de los temporales");
+        System.out.println(playerBoard.showBoard(playerBoard.getBoard()));
+        System.out.println(botBoard.showBoard(botBoard.getBoard()));
+
+        createBoardShips();
+        for (int i = 1; i < 5; i++) {
+            organizePlayerShipsInVBox(i);
+        }
         createBotTable();
-        createPlayerTable();
+        loadPlayerTable();
+
+        handleClickStart();
+        loadShootsOnBoard(1, temporalBotBoard);
+        loadShootsOnBoard(2, temporalPlayerBoard);
+
+        isLoadingMatch = false;
+    }
+    /**
+     * Starts a new game or resumes a loaded match.
+     * Initializes the player and bot boards and sets up the game state.
+     * @param isLoadedMatch {@code true} if resuming a saved match, {@code false} for a new game.
+     * @param loadedProfile the profile name of the player.
+     * @see #loadingMatch(String)
+     * @see #createBoardShips()
+     * @version 1.0
+     */
+    public void startPlay(boolean isLoadedMatch, String loadedProfile){
+        playerDataHandler = new PlayerDataHandler();
+        System.out.println("perfiles creados " + playerDataHandler.getNicknamesData());
         imgBotCloud.setVisible(false);
         imgPlayerCloud.setVisible(false);
-    }
+        Collections.addAll(temporaryNumberBoats, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4);
+        if(isLoadedMatch){
+            try{
 
+                loadingMatch(loadedProfile);
+
+                matchStarted=true;
+                profilePointsLoaded = playerBoard.getBoatsSunkEver();
+
+            }catch( Exception e){
+                System.out.println("Creating new match. "+e.getMessage());
+                isLoadedMatch = false;
+                isLoadingMatch = false;
+            }
+        }
+        if(!isLoadedMatch){
+            playerBoard = new PlayerBoard();
+            playerBoard.setNickname(loadedProfile);
+            botBoard = new BotBoard();
+            createBoardShips();
+            for (int i = 1; i < 5; i++) {
+                organizePlayerShipsInVBox(i);
+            }
+            createBotTable();
+            createPlayerTable();
+        }
+    }
 }
