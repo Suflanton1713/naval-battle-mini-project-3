@@ -50,7 +50,7 @@ public class GameView extends Stage {
         Scene scene = new Scene(mainPane, 1200, 670);
         scene.getStylesheets().add(getClass().getResource("/com/example/navalbattleminiproject3/styles/styleGame.css").toExternalForm());
         setScene(scene);
-        setTitle("Sudoku");
+        setTitle("Star Wars Naval Battle");
         getIcons().add(new Image(getClass().getResourceAsStream("/com/example/navalbattleminiproject3/images/favicon.png")));
         setResizable(false);
         initStyle(StageStyle.UNDECORATED);
