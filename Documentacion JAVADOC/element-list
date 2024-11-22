@@ -1,0 +1,8 @@
+module:com.example.navalbattleminiproject3
+com.example.navalbattleminiproject3
+com.example.navalbattleminiproject3.controller
+com.example.navalbattleminiproject3.model.board.Board
+com.example.navalbattleminiproject3.model.board.Exception
+com.example.navalbattleminiproject3.model.board.GameData
+com.example.navalbattleminiproject3.model.board.GamePieces
+com.example.navalbattleminiproject3.view
