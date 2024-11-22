@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="166.0" prefWidth="256.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Circle fill="#eae9e9" layoutX="138.0" layoutY="83.0" radius="82.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fill="#000000c7" layoutX="140.0" layoutY="47.0" radius="27.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fill="RED" layoutX="140.0" layoutY="42.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#eae9e9" height="14.0" layoutX="57.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="162.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="132.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="117.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="101.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="85.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="69.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="147.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="162.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="177.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="192.0" layoutY="96.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="84.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="100.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="117.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="132.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="148.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="163.0" layoutY="126.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="177.0" layoutY="127.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="64.0" layoutY="50.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="78.0" layoutY="50.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="92.0" layoutY="50.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="92.0" layoutY="20.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="78.0" layoutY="29.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="171.0" layoutY="49.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="185.0" layoutY="49.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="199.0" layoutY="49.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="28.0" layoutX="171.0" layoutY="19.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="185.0" layoutY="28.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="107.0" layoutY="9.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="15.0" layoutX="123.0" layoutY="4.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="15.0" layoutX="140.0" layoutY="3.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b7b7b7" height="18.0" layoutX="157.0" layoutY="8.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="12.0" />
+      <Circle fill="#767676" layoutX="75.0" layoutY="87.0" radius="6.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fill="#999999" layoutX="204.0" layoutY="87.0" radius="6.0" stroke="BLACK" strokeType="INSIDE" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="10.0" layoutX="119.0" layoutY="82.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" width="40.0" />
+   </children>
+</Pane>

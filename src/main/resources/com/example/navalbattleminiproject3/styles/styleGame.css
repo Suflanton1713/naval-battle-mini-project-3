@@ -1,0 +1,65 @@
+#exitButton{
+    -fx-background-color: #fd6900;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+}
+#exitButton:hover {
+    -fx-background-color: #ff0000;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: "hand";
+}
+
+.dialog-pane {
+    -fx-background-image: url('../images/backgrounds/winBackground.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+    -fx-border-color: #000065;
+    -fx-border-width: 10px;
+    -fx-pref-width: 1100px; /* Ancho preferido de la alerta */
+    -fx-pref-height: 260px; /* Alto preferido de la alerta */
+
+}
+
+#GridGameBackground{
+    -fx-background-image: url('../images/backgrounds/gameBackground.png');
+    -fx-background-position: center center;
+    -fx-background-size: cover;
+}
+
+#vBoxStack{
+    -fx-background-color: rgba(0, 30, 140, 0.5);
+}
+
+.buttons{
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-background-color: transparent;
+    -fx-background-position: center center;
+    -fx-border-color: white;
+}
+.buttons:hover{
+    -fx-border-radius: 3px;
+    -fx-border-width: 2px;
+    -fx-border-color: #fafa4b;
+}
+
+
+.custom-alert {
+    -fx-background-color: #d0e7ff; /* Azul claro */
+    -fx-font-family: "Arial"; /* Fuente */
+    -fx-text-fill: black; /* Texto negro */
+}
+
+.custom-alert .header-panel {
+    -fx-background-color: #a7c4ff; /* Azul más oscuro para el encabezado */
+    -fx-text-fill: black; /* Texto negro */
+}
+
+.custom-alert .content {
+    -fx-text-fill: black; /* Texto negro del contenido */
+}
+
+.custom-alert .button-bar {
+    -fx-background-color: #d0e7ff; /* Azul claro para los botones */
+}

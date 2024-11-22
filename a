@@ -1,0 +1,48 @@
+[33mcommit f030f624e3262bbcbf3f17733a40824014ea3b44[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmjst[m[33m, [m[1;31morigin/mjst[m[33m, [m[1;31morigin/jdrl[m[33m)[m
+Author: Juan Rincón <juandavidrinconl@gmail.com>
+Date:   Wed Nov 13 10:17:17 2024 -0500
+
+    Redesign of the entire main menu (WelcomeView), folder layout and character initialization (yoda).
+
+[33mcommit d1c3cf93fa3c3ef0b4e7c65754c0e8ce7efb211c[m
+Author: Maria Juliana Saavedra <maria.juliana.saavedra@correounivalle.edu.co>
+Date:   Wed Nov 13 01:42:00 2024 -0500
+
+    starting controller
+
+[33mcommit 8f30de3001dca86deb1ba69d1ab757b0f36b8857[m
+Merge: c723b0d d87d27b
+Author: Maria Juliana Saavedra <maria.juliana.saavedra@correounivalle.edu.co>
+Date:   Tue Nov 12 21:56:45 2024 -0500
+
+    resolved conflicts
+
+[33mcommit d87d27b029697c27bdebf9a884121f1a13f53141[m
+Author: Libardo Alejandro Quintero Gómez <quintero.libardo@correounivalle.edu.co>
+Date:   Tue Nov 12 02:20:33 2024 -0500
+
+    Boats generation and destroying boat system
+
+[33mcommit c723b0d5354df5d8460f944e1d89011e18d52ef6[m
+Author: Maria Juliana Saavedra <maria.juliana.saavedra@correounivalle.edu.co>
+Date:   Tue Nov 12 00:30:23 2024 -0500
+
+    fill position grid pane with buttons
+
+[33mcommit f6811bd75bf11ed3f63229734d88f2a16028497a[m
+Author: Libardo Alejandro Quintero Gómez <quintero.libardo@correounivalle.edu.co>
+Date:   Mon Nov 11 06:05:48 2024 -0500
+
+    Working on
+
+[33mcommit 60b58fdf643bfc57460961e31a7f03c1499b30d1[m
+Author: Libardo Alejandro Quintero Gómez <quintero.libardo@correounivalle.edu.co>
+Date:   Sun Nov 10 19:50:40 2024 -0500
+
+    Project working space created
+
+[33mcommit 28b9fa6a011a6525ba968c84db863e48bef9cee8[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Libardo Alejandro Quintero Gómez <quintero.libardo@correounivalle.edu.co>
+Date:   Sun Nov 10 19:28:51 2024 -0500
+
+    Initializating project
