@@ -909,7 +909,7 @@ public class GameController {
      * @param row the row index where the shot is targeted.
      * @param col the column index where the shot is targeted.
      * @param playerOrBot {@code 1} if the shot is from the player, {@code 2} if it's from the bot.
-     * @throws Exception if an error occurs during the shot process.
+
      * @see #makeBoatDestroyed(int, int, int)
      * @see #getNodeFromGridPane(GridPane, int, int)
      * @version 1.0

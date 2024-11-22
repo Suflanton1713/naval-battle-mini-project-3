@@ -89,7 +89,7 @@ public class WelcomeController {
         gameView.setBotCharacter(characterImages);
 
         // Iniciar el juego
-        gameView.getGameController().initialize(true, newNameProfile);
+        gameView.getGameController().initialize(false, newNameProfile);
     }
     /**
      * Continues a previously saved game.
